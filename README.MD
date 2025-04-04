@@ -6,6 +6,7 @@ pip install uv
 ```
 ### Рабочие зависимости:
 ### Windows:
+### Для запуска backend
 ```shell
 cd backend
 uv venv .venv
