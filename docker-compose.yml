@@ -28,13 +28,25 @@ services:
       - redis
       - db
 
-  backend:
+  socketio:
     build:
       context: backend
     entrypoint: python3 /backend/src/socketio_room.py
     restart: always
     ports:
       - "8000:8000"
+    volumes:
+      - ./backend:/backend
+    depends_on:
+      - redis
+      - db
+
+  backend:
+    build:
+      context: backend
+    command: [ "sh", "/backend/docker/serve.sh" ]
+    ports:
+      - "8080:8080"
     volumes:
       - ./backend:/backend
     depends_on:

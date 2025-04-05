@@ -18,6 +18,10 @@ run:
 	cd src && \
 	uvicorn presentation.web_api.main:app --reload
 
+run-prod:
+	cd src && \
+	python3 presentation/web_api/main.py
+
 migration:
 	alembic revision --autogenerate
 
