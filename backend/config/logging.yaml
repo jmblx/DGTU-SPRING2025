@@ -11,7 +11,7 @@ formatters:
     style: "{"
   access:
     (): "uvicorn.logging.AccessFormatter"
-    fmt: "{asctime} {levelname} [{name}] [{filename}:{lineno}] [trace_id={otelTraceID} span_id={otelSpanID} resource.service.name={otelServiceName}] - {message}"
+    fmt: '{asctime} {levelname} [{name}] [{filename}:{lineno}] - {message}'  # Убраны otelTraceID, otelSpanID, otelServiceName
     style: "{"
 handlers:
   default:
