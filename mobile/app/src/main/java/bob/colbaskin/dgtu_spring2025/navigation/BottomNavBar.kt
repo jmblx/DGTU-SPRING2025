@@ -42,7 +42,7 @@ fun BottomNavBar(navController: NavHostController) {
 fun RowScope.AddItem(
     screen: Screens,
     currentDestination: NavDestination?,
-    navController: NavHostController
+    navController: NavHostController,
 ) {
     NavigationBarItem(
         selected = currentDestination?.hierarchy?.any {
@@ -60,6 +60,6 @@ fun RowScope.AddItem(
                 contentDescription = null
             )
         },
-        label = { Text(screen.label) },
+        label = { Text(screen.label) }
     )
 }
