@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 
 @pytest.mark.asyncio
-async def test_user_repo_add(
+async def test_db(
     async_session: AsyncSession,
 ):
     await async_session.execute(text("SELECT 1"))

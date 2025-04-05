@@ -1,16 +1,14 @@
-import os
+import tomllib
+from pathlib import Path
 
-from dotenv import load_dotenv
+config_path = Path(__file__).parent.parent / "config" / "test_config.toml"
 
-load_dotenv()
+with open(config_path, "rb") as f:
+    config = tomllib.load(f)
 
-DB_HOST_TEST = os.environ.get("DB_HOST_TEST")
-DB_PORT_TEST = os.environ.get("DB_PORT_TEST")
-DB_NAME_TEST = os.environ.get("DB_NAME_TEST")
-DB_USER_TEST = os.environ.get("DB_USER_TEST")
-DB_PASS_TEST = os.environ.get("DB_PASS_TEST")
-TEST_DATABASE_URI = os.environ.get(
-    "TEST_DATABASE_URI",
-    f"postgresql+asyncpg://{DB_USER_TEST}:"
-    f"{DB_PASS_TEST}@{DB_HOST_TEST}:{DB_PORT_TEST}/{DB_NAME_TEST}",
+db = config["database"]
+
+TEST_DATABASE_URI = (
+    f"postgresql+asyncpg://{db['user']}:{db['password']}@"
+    f"{db['host']}:{db['port']}/{db['name']}"
 )

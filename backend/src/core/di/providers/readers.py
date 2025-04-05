@@ -1,5 +1,4 @@
-from dishka import Provider, provide, Scope
+from dishka import Provider
 
 
-class ReaderProvider(Provider):
-    ...
+class ReaderProvider(Provider): ...

@@ -2,32 +2,24 @@ import os
 import sys
 from logging.config import fileConfig
 
-from alembic import context
-from sqlalchemy import engine_from_config, pool, create_engine
-
+from core.config import config_loader
 from infrastructure.db.models import Base
+from sqlalchemy import create_engine
 
-sys.path.append(
-    os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../"))
-)
+from alembic import context
 
-import infrastructure.db.models
-from infrastructure.db.config import (
-    DB_HOST,
-    DB_PORT,
-    DB_NAME,
-    DB_USER,
-    DB_PASS,
-)
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../")))
 
 config = context.config
 
+db_config = config_loader.app_config.database
+
 section = config.config_ini_section
-config.set_section_option(section, "DB_HOST", DB_HOST)
-config.set_section_option(section, "DB_PORT", DB_PORT)
-config.set_section_option(section, "DB_USER", DB_USER)
-config.set_section_option(section, "DB_NAME", DB_NAME)
-config.set_section_option(section, "DB_PASS", DB_PASS)
+config.set_section_option(section, "DB_HOST", db_config.host)
+config.set_section_option(section, "DB_PORT", db_config.port)
+config.set_section_option(section, "DB_USER", db_config.user)
+config.set_section_option(section, "DB_NAME", db_config.name)
+config.set_section_option(section, "DB_PASS", db_config.password)
 
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
@@ -35,14 +27,12 @@ if config.config_file_name is not None:
 target_metadata = Base.metadata
 
 
-# Получаем URL базы данных
 def get_url():
     return config.get_main_option("sqlalchemy.url")
 
 
 def run_migrations_offline() -> None:
-    """Выполнение миграций в 'офлайн' режиме."""
-    url = get_url()
+    url = config.get_main_option("sqlalchemy.url")
     context.configure(
         url=url,
         target_metadata=target_metadata,
@@ -54,27 +44,16 @@ def run_migrations_offline() -> None:
         context.run_migrations()
 
 
-def run_migrations_online() -> None:
-    """Выполнение миграций в 'онлайн' режиме."""
-    url = get_url()
+def run_migrations_online():
+    url = config.get_main_option("sqlalchemy.url")
 
-    if "asyncpg" in url:  # Если URL асинхронный, заменяем его на синхронный
-        sync_url = url.replace("asyncpg", "psycopg2").replace(
-            "?async_fallback=True", ""
-        )  # Заменяем на синхронный драйвер
-        connectable = create_engine(sync_url, poolclass=pool.NullPool)
-    else:
-        connectable = engine_from_config(
-            config.get_section(config.config_ini_section, {}),
-            prefix="sqlalchemy.",
-            poolclass=pool.NullPool,
-        )
+    # Заменяем asyncpg → psycopg2 только в тестах
+    if os.getenv("TESTING") == "true" and "asyncpg" in url:
+        url = url.replace("asyncpg", "psycopg2").split("?")[0]
 
+    connectable = create_engine(url)
     with connectable.connect() as connection:
-        context.configure(
-            connection=connection, target_metadata=target_metadata
-        )
-
+        context.configure(connection=connection, target_metadata=target_metadata)
         with context.begin_transaction():
             context.run_migrations()
 

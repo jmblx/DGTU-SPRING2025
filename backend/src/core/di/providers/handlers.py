@@ -1,5 +1,4 @@
-from dishka import provide, Provider, Scope
+from dishka import Provider
 
 
-class HandlerProvider(Provider):
-    ...
+class HandlerProvider(Provider): ...

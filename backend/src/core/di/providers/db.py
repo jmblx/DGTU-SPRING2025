@@ -1,6 +1,7 @@
 import os
 from collections.abc import AsyncIterable
 
+from core.config import DatabaseConfig
 from dishka import Provider, Scope, provide
 from sqlalchemy import NullPool
 from sqlalchemy.ext.asyncio import (
@@ -10,22 +11,14 @@ from sqlalchemy.ext.asyncio import (
     create_async_engine,
 )
 
-from infrastructure.db.config import DatabaseConfig
-
 
 class DBProvider(Provider):
     scope = Scope.APP
 
     @provide(scope=Scope.APP)
-    def provide_config(self) -> DatabaseConfig:
-        return DatabaseConfig.from_env()
-
-    @provide(scope=Scope.APP)
     def provide_engine(self, config: DatabaseConfig) -> AsyncEngine:
         pool_class = (
-            NullPool
-            if os.getenv("USE_NULLPOOL", "false").lower() == "true"
-            else None
+            NullPool if os.getenv("USE_NULLPOOL", "false").lower() == "true" else None
         )
         return create_async_engine(config.db_uri, poolclass=pool_class)
 

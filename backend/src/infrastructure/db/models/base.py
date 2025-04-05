@@ -1,3 +1,11 @@
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import MetaData
+from sqlalchemy.orm import DeclarativeBase, registry
 
-Base = declarative_base()
+mapper_registry = registry(metadata=MetaData())
+
+
+class Base(DeclarativeBase):
+    registry = mapper_registry
+    metadata = mapper_registry.metadata
+
+    __abstract__ = True

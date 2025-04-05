@@ -15,13 +15,11 @@ migrate:
 	alembic upgrade head
 
 run:
-	.venv\Scripts\activate && \
 	cd src && \
-	python -m presentation.web_api.main
+	uvicorn presentation.web_api.main:app
 
 migration:
 	alembic revision --autogenerate
-	alembic upgrade head
 
 build:
 	docker build -t race_simulation.api:latest .

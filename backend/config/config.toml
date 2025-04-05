@@ -1,9 +1,19 @@
+[global]
+debug = true
+
 [gunicorn]
 bind = "0.0.0.0:8000"
 workers = 2
 timeout = 30
 worker_class = "uvicorn.workers.UvicornWorker"
 
-[logging]
-level = "DEBUG"
-render_json_logs = true
+[database]
+host = "localhost"
+port = "5432"
+name = "race_simulation"
+user = "postgres"
+password = "postgres"
+
+[redis]
+host = "redis"
+port = 6379

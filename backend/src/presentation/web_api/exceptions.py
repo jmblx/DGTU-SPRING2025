@@ -2,17 +2,13 @@ import logging
 from collections.abc import Awaitable, Callable
 from functools import partial
 
+from application.common.errors.base import AppError
 from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
+from presentation.web_api.responses import ErrorData, ErrorResponse
 from starlette import status
 from starlette.requests import Request
 from starlette.status import HTTP_500_INTERNAL_SERVER_ERROR
-
-from application.common.errors.base import AppError
-# from presentation.web_api.config import TRACING
-# from presentation.web_api.middlewares.metrics import APP_NAME
-# from presentation.web_api.middlewares.metrics.labels import EXCEPTIONS
-from presentation.web_api.responses import ErrorData, ErrorResponse
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +21,6 @@ def setup_exception_handlers(app: FastAPI):
     app.add_exception_handler(Exception, unknown_exception_handler)
 
 
-
 def error_handler(
     status_code: int,
 ) -> Callable[..., Awaitable[ORJSONResponse]]:
@@ -35,18 +30,7 @@ def error_handler(
 async def app_error_handler(
     request: Request, err: AppError, status_code: int
 ) -> ORJSONResponse:
-    method = request.method
-    path = request.url.path
-
     logger.error("Handle error", exc_info=err, extra={"error": err})
-
-    # if TRACING:
-    #     EXCEPTIONS.labels(
-    #         method=method,
-    #         path=path,
-    #         exception_type=type(err).__name__,
-    #         app_name=APP_NAME,
-    #     ).inc()
 
     return await handle_error(
         request=request,
@@ -57,24 +41,9 @@ async def app_error_handler(
     )
 
 
-async def unknown_exception_handler(
-    request: Request, err: Exception
-) -> ORJSONResponse:
-    method = request.method
-    path = request.url.path
-
+async def unknown_exception_handler(request: Request, err: Exception) -> ORJSONResponse:
     logger.error("Handle error", exc_info=err, extra={"error": err})
-    logger.exception(
-        "Unknown error occurred", exc_info=err, extra={"error": err}
-    )
-
-    # if TRACING:
-    #     EXCEPTIONS.labels(
-    #         method=method,
-    #         path=path,
-    #         exception_type=type(err).__name__,
-    #         app_name=APP_NAME,
-    #     ).inc()
+    logger.exception("Unknown error occurred", exc_info=err, extra={"error": err})
 
     return ORJSONResponse(
         ErrorResponse(
