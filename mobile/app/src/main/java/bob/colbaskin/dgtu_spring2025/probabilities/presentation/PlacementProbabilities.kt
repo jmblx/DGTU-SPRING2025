@@ -6,9 +6,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import bob.colbaskin.dgtu_spring2025.probabilities.domain.models.convertToProbabilityWithSymbols
 import bob.colbaskin.dgtu_spring2025.probabilities.domain.models.probabilities
+import bob.colbaskin.dgtu_spring2025.ui.theme.CustomTheme
 import com.breens.beetablescompose.BeeTablesCompose
 
 
@@ -26,13 +28,14 @@ fun PlacementProbabilities() {
             enableTableHeaderTitles = true,
             disableVerticalDividers = true,
             headerTableTitles = titles,
-            headerTitlesBackGroundColor = Color.DarkGray,
+            headerTitlesBackGroundColor = CustomTheme.colors.headerTable,
             tableRowColors = listOf(
-                Color.LightGray,
-                Color.LightGray,
+                CustomTheme.colors.tableRow,
+                CustomTheme.colors.tableRow,
             ),
             contentAlignment= Alignment.Center,
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
+            headerTitlesTextStyle = TextStyle(color = Color.White)
         )
     }
 }

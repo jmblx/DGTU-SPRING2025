@@ -25,6 +25,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import bob.colbaskin.dgtu_spring2025.ui.theme.CustomTheme
 
 data class TabItem(
     val index: Int,
@@ -81,7 +82,8 @@ fun TabButton(
     Button(
         onClick = onClick,
         colors = ButtonDefaults.buttonColors(
-            containerColor = if (isSelected) Color(0xFF3AC6FF) else Color(0xFF2E2E2E)
+            containerColor = if (isSelected) CustomTheme.colors.activeButton
+                else CustomTheme.colors.defaultButton
         ),
         shape = MaterialTheme.shapes.small,
         contentPadding = PaddingValues(8.dp),
@@ -94,7 +96,7 @@ fun TabButton(
             Text(
                 text = text,
                 style = TextStyle(
-                    color = Color.White,
+                    color = CustomTheme.colors.text,
                     fontWeight = FontWeight.Bold
                 ),
                 textAlign = TextAlign.Center

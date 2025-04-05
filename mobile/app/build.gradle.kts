@@ -11,7 +11,7 @@ android {
 
     defaultConfig {
         applicationId = "bob.colbaskin.dgtu_spring2025"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
@@ -68,4 +68,5 @@ dependencies {
     implementation(libs.vico.compose.m2)
     implementation(libs.vico.compose.m3)
     implementation(libs.vico.core)
+    implementation(libs.accompanist.systemuicontroller)
 }

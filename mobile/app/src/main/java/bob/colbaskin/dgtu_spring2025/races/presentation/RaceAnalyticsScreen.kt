@@ -75,45 +75,45 @@ private fun JetpackComposeRaceChart(
             rememberLineCartesianLayer(
                 lineProvider = LineCartesianLayer.LineProvider.series(
                     LineCartesianLayer.Line(
-                        fill = LineCartesianLayer.LineFill.single(fill(Color(0xFF77D879))),
+                        fill = LineCartesianLayer.LineFill.single(fill(Color(0xFFF8312F))),
                         stroke = LineCartesianLayer.LineStroke.Continuous(),
                         pointProvider = LineCartesianLayer.PointProvider.single(
-                            LineCartesianLayer.point(rememberShapeComponent(fill(Color(0xFF77D879)), CorneredShape.Pill))
+                            LineCartesianLayer.point(rememberShapeComponent(fill(Color(0xFFF8312F)), CorneredShape.Pill))
                         )
                     ),
                     LineCartesianLayer.Line(
-                        fill = LineCartesianLayer.LineFill.single(fill(Color(0xFF2A8ED0))),
+                        fill = LineCartesianLayer.LineFill.single(fill(Color(0xFF0074BA))),
                         stroke = LineCartesianLayer.LineStroke.Continuous(),
                         pointProvider = LineCartesianLayer.PointProvider.single(
-                            LineCartesianLayer.point(rememberShapeComponent(fill(Color(0xFF2A8ED0)), CorneredShape.Pill))
+                            LineCartesianLayer.point(rememberShapeComponent(fill(Color(0xFF0074BA)), CorneredShape.Pill))
                         )
                     ),
                     LineCartesianLayer.Line(
-                        fill = LineCartesianLayer.LineFill.single(fill(Color(0xFFF0A500))),
+                        fill = LineCartesianLayer.LineFill.single(fill(Color(0xFFFCD53F))),
                         stroke = LineCartesianLayer.LineStroke.Continuous(),
                         pointProvider = LineCartesianLayer.PointProvider.single(
-                            LineCartesianLayer.point(rememberShapeComponent(fill(Color(0xFFF0A500)), CorneredShape.Pill))
+                            LineCartesianLayer.point(rememberShapeComponent(fill(Color(0xFFFCD53F)), CorneredShape.Pill))
                         )
                     ),
                     LineCartesianLayer.Line(
-                        fill = LineCartesianLayer.LineFill.single(fill(Color(0xFF9B7C41))),
+                        fill = LineCartesianLayer.LineFill.single(fill(Color(0xFF00D26A))),
                         stroke = LineCartesianLayer.LineStroke.Continuous(),
                         pointProvider = LineCartesianLayer.PointProvider.single(
-                            LineCartesianLayer.point(rememberShapeComponent(fill(Color(0xFF9B7C41)), CorneredShape.Pill))
+                            LineCartesianLayer.point(rememberShapeComponent(fill(Color(0xFF00D26A)), CorneredShape.Pill))
                         )
                     ),
                     LineCartesianLayer.Line(
-                        fill = LineCartesianLayer.LineFill.single(fill(Color(0xFFF06292))),
+                        fill = LineCartesianLayer.LineFill.single(fill(Color(0xFF8D65C5))),
                         stroke = LineCartesianLayer.LineStroke.Continuous(),
                         pointProvider = LineCartesianLayer.PointProvider.single(
-                            LineCartesianLayer.point(rememberShapeComponent(fill(Color(0xFFF06292)), CorneredShape.Pill))
+                            LineCartesianLayer.point(rememberShapeComponent(fill(Color(0xFF8D65C5)), CorneredShape.Pill))
                         )
                     ),
                     LineCartesianLayer.Line(
-                        fill = LineCartesianLayer.LineFill.single(fill(Color(0xFF8D6E63))),
+                        fill = LineCartesianLayer.LineFill.single(fill(Color(0xFF000000))),
                         stroke = LineCartesianLayer.LineStroke.Continuous(),
                         pointProvider = LineCartesianLayer.PointProvider.single(
-                            LineCartesianLayer.point(rememberShapeComponent(fill(Color(0xFF8D6E63)), CorneredShape.Pill))
+                            LineCartesianLayer.point(rememberShapeComponent(fill(Color(0xFF000000)), CorneredShape.Pill))
                         )
                     )
                 )

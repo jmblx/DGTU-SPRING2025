@@ -1,17 +1,25 @@
 package bob.colbaskin.dgtu_spring2025.navigation
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
+import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.zIndex
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import bob.colbaskin.dgtu_spring2025.ui.theme.CustomTheme
 
 @Composable
 fun BottomNavBar(navController: NavHostController) {
@@ -26,7 +34,10 @@ fun BottomNavBar(navController: NavHostController) {
 
     val bottomBarDestination = screens.any { it.route ==  currentDestination?.route }
     if (bottomBarDestination) {
-        NavigationBar {
+        NavigationBar(
+            containerColor = CustomTheme.colors.bottomBar,
+            contentColor = CustomTheme.colors.text
+        ) {
             screens.forEach { screen ->
                 AddItem (
                     screen,
@@ -44,10 +55,11 @@ fun RowScope.AddItem(
     currentDestination: NavDestination?,
     navController: NavHostController,
 ) {
+    val isSelected = currentDestination?.hierarchy?.any {
+        it.route == screen.route
+    } == true
     NavigationBarItem(
-        selected = currentDestination?.hierarchy?.any {
-            it.route == screen.route
-        } == true,
+        selected = isSelected,
         onClick = {
             navController.navigate(screen.route) {
                 popUpTo(navController.graph.findStartDestination().id)
@@ -57,9 +69,15 @@ fun RowScope.AddItem(
         icon = {
             Icon(
                 imageVector = screen.icon,
-                contentDescription = null
+                contentDescription = null,
+                tint = CustomTheme.colors.text
             )
         },
-        label = { Text(screen.label) }
+        label = {
+            Text(
+                screen.label,
+                color = CustomTheme.colors.text
+            )
+        }
     )
 }

@@ -1,5 +1,6 @@
 package bob.colbaskin.dgtu_spring2025.navigation
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -12,6 +13,8 @@ import androidx.navigation.compose.rememberNavController
 import bob.colbaskin.dgtu_spring2025.history.presentation.HistoryScreen
 import bob.colbaskin.dgtu_spring2025.probabilities.presentation.ProbabilitiesScreen
 import bob.colbaskin.dgtu_spring2025.races.presentation.RacesScreen
+import bob.colbaskin.dgtu_spring2025.ui.theme.CustomTheme
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 @Composable
 fun AppNavHost() {
@@ -24,6 +27,7 @@ fun AppNavHost() {
             startDestination = Screens.Races.route,
             modifier = Modifier
                 .padding(innerPadding)
+                .background(CustomTheme.colors.background)
         ) {
             composable(route = Screens.Races.route) {
                 Box(contentAlignment = Alignment.Center) {

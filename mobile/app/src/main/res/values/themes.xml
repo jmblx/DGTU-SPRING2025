@@ -1,17 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.DGTUSPRING2025" parent="android:Theme.Material.Light.NoActionBar">
-        <item name="android:statusBarColor">#FF191919</item>
-        <item name="android:windowBackground">#FF191919</item>
-
-        <item name="android:windowIsTranslucent">true</item>
-        <item name="android:windowDisablePreview">true</item>
-    </style>
+    <style name="Theme.DGTUSPRING2025" parent="android:Theme.Material.Light.NoActionBar"/>
 
     <style name="Theme.SplashScreen" parent="android:Theme.Material.Light.NoActionBar">
-        <item name="android:statusBarColor">#FF191919</item>
-        <item name="android:windowBackground">#FF191919</item>
+        <item name="android:statusBarColor">@color/splash_background_color</item>
+        <item name="android:windowBackground">@color/splash_background_color</item>
 
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowDisablePreview">true</item>

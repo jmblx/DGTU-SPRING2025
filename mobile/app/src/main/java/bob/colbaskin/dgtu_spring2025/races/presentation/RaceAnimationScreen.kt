@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -35,6 +36,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -43,6 +45,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
+import androidx.core.graphics.rotationMatrix
+import bob.colbaskin.dgtu_spring2025.ui.theme.CustomTheme
 import kotlinx.coroutines.launch
 
 @Composable
@@ -79,8 +84,7 @@ fun RaceSimulation() {
                     .height(50.dp)
                     .clip(RoundedCornerShape(24.dp))
                     .background(Color(0xFF823E39))
-                    .border(1.dp, Color.White, RoundedCornerShape(24.dp))
-
+                    .border(1.dp, CustomTheme.colors.raceBorder, RoundedCornerShape(24.dp))
             ) {
                 Text(
                     icons[index],
@@ -88,19 +92,32 @@ fun RaceSimulation() {
                         .align(Alignment.CenterStart)
                         .padding(horizontal = 16.dp)
                         .offset(x = iconXOffset)
-                        .onGloballyPositioned {
-                            boxWidth = maxWidth
-                            Log.d("RaceAnimationScreen", "boxWidth = $boxWidth")
-                        },
+                        .onGloballyPositioned { boxWidth = maxWidth }
+                        .zIndex(1f),
                     fontSize = 32.sp
+                )
+                Text(
+                    text = "🏁",
+                    fontSize = 50.sp,
+                    modifier = Modifier
+                        .offset(x = boxWidth - textSizeInDp)
+                        .rotate(90f)
+                        .zIndex(0f),
                 )
             }
         }
         Button(
             onClick = { isAnimated = !isAnimated },
-            enabled = !isAnimated
+            enabled = !isAnimated,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = CustomTheme.colors.defaultButton,
+                contentColor = CustomTheme.colors.text
+            )
         ) {
-            Text("Начать симуляцию!")
+            Text(
+                "Начать симуляцию!",
+                color = CustomTheme.colors.text
+            )
         }
     }
 }

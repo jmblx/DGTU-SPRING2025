@@ -1,4 +1,5 @@
 [versions]
+accompanistSystemuicontroller = "0.28.0"
 agp = "8.9.1"
 beetablescompose = "1.2.0"
 kotlin = "2.1.0"
@@ -43,6 +44,7 @@ vico = "2.1.0"
 
 
 [libraries]
+accompanist-systemuicontroller = { module = "com.google.accompanist:accompanist-systemuicontroller", version.ref = "accompanistSystemuicontroller" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-material-icons-core = { module = "androidx.compose.material:material-icons-core", version.ref = "materialIconsCore" }
 androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsCore" }
