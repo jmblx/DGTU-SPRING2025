@@ -14,7 +14,6 @@ import bob.colbaskin.dgtu_spring2025.history.presentation.HistoryScreen
 import bob.colbaskin.dgtu_spring2025.probabilities.presentation.ProbabilitiesScreen
 import bob.colbaskin.dgtu_spring2025.races.presentation.RacesScreen
 import bob.colbaskin.dgtu_spring2025.ui.theme.CustomTheme
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 @Composable
 fun AppNavHost() {
@@ -32,6 +31,7 @@ fun AppNavHost() {
             composable(route = Screens.Races.route) {
                 Box(contentAlignment = Alignment.Center) {
                     RacesScreen()
+
                 }
             }
 
