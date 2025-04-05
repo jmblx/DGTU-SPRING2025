@@ -8,7 +8,7 @@ timeout = 30
 worker_class = "uvicorn.workers.UvicornWorker"
 
 [database]
-host = "localhost"
+host = "db"
 port = "5432"
 name = "race_simulation"
 user = "postgres"
