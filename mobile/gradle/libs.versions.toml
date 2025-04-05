@@ -35,6 +35,7 @@ animatedNavigationBar = "1.0.0"
 lottieCompose = "6.6.3"
 
 #Linter
+secretsGradlePlugin = "2.0.1"
 socketIoClient = "2.0.1"
 spotless = "6.25.0"
 
@@ -93,6 +94,7 @@ animated-navigation-bar = { module = "com.exyte:animated-navigation-bar", versio
 lottie-compose = { group = "com.airbnb.android", name = "lottie-compose", version.ref = "lottieCompose" }
 
 #Charts
+secrets-gradle-plugin = { module = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin:secrets-gradle-plugin", version.ref = "secretsGradlePlugin" }
 socket-io-client = { module = "io.socket:socket.io-client", version.ref = "socketIoClient" }
 vico-compose = { group = "com.patrykandpatrick.vico", name = "compose", version.ref = "vico" }
 vico-compose-m2 = { group = "com.patrykandpatrick.vico", name = "compose-m2", version.ref = "vico" }

@@ -6,6 +6,7 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -17,13 +18,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,11 +35,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
+import bob.colbaskin.dgtu_spring2025.R
+import bob.colbaskin.dgtu_spring2025.races.domain.models.Runner
 import bob.colbaskin.dgtu_spring2025.ui.theme.CustomTheme
+import bob.colbaskin.dgtu_spring2025.utils.Lottie
 
 @Composable
 fun RaceAnimationScreen(viewModel: RacesViewModel = hiltViewModel()) {
     val uiState by viewModel.uiState
+    val selectedRunner by viewModel.selectedRunner
 
     Column (
         modifier = Modifier
@@ -52,9 +56,41 @@ fun RaceAnimationScreen(viewModel: RacesViewModel = hiltViewModel()) {
             is RaceUiState.Loading -> LoadingView()
             is RaceUiState.Error -> ErrorView(state.message)
             is RaceUiState.Success -> RaceContent(state)
-            is RaceUiState.Waiting -> WaitingView(state.totalRaces)
+            else -> LoadingView()
         }
     }
+
+    selectedRunner?.let { runner ->
+        RunnerDetailsDialog(
+            runner = runner,
+            onDismiss = { viewModel.dismissRunnerDialog() }
+        )
+    }
+}
+
+@Composable
+private fun RunnerDetailsDialog(
+    runner: Runner,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text("Участник ${runner.id}", style = MaterialTheme.typography.headlineSmall)
+        },
+        text = {
+            Column {
+                Text("Текущий прогресс: ${"%.1f".format(runner.progress)}%")
+                Spacer(Modifier.height(8.dp))
+                Text("Статус: ${if (runner.finished) "Финишировал" else "В процессе"}")
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Закрыть")
+            }
+        }
+    )
 }
 
 @Composable
@@ -66,11 +102,12 @@ private fun RaceContent(state: RaceUiState.Success) {
 
 @SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
-private fun RunnerTrack(runner: bob.colbaskin.dgtu_spring2025.races.domain.models.Runner) {
+private fun RunnerTrack(runner: Runner, viewModel: RacesViewModel = hiltViewModel()) {
     BoxWithConstraints(
         modifier = Modifier
             .fillMaxWidth()
             .height(50.dp)
+            .clickable { viewModel.selectRunner(runner) }
     ) {
         val density = LocalDensity.current
         val textWidth = with(density) { 32.sp.toDp() }
@@ -118,7 +155,16 @@ private fun LoadingView() {
             .padding(16.dp),
         contentAlignment = Alignment.Center
     ) {
-        Text("Загрузка данных...", color = CustomTheme.colors.text)
+        Column(
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Lottie(lottieJson = R.raw.loading_steps)
+            Text(
+                "Загрузка данных...",
+                color = CustomTheme.colors.text
+            )
+        }
     }
 }
 
@@ -131,52 +177,6 @@ private fun ErrorView(message: String) {
         contentAlignment = Alignment.Center
     ) {
         Text("Ошибка: $message", color = Color.Red)
-    }
-}
-
-@Composable
-private fun WaitingView(totalRaces: Int) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(CustomTheme.colors.background)
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                "🎉 Следующий забег скоро начнётся!",
-                style = MaterialTheme.typography.headlineSmall,
-                color = CustomTheme.colors.text
-            )
-            Spacer(Modifier.height(24.dp))
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(200.dp)
-                    .background(Color(0xFF823E39), RoundedCornerShape(16.dp))
-                    .border(2.dp, CustomTheme.colors.raceBorder, RoundedCornerShape(16.dp)),
-                contentAlignment = Alignment.Center
-            ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        "🕒 Ожидаем новых участников...",
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = Color.LightGray
-                    )
-                    Spacer(Modifier.height(24.dp))
-                    Text(
-                        "💰 Делайте ваши ставки!",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = CustomTheme.colors.text
-                    )
-                }
-            }
-        }
     }
 }
 

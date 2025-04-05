@@ -15,6 +15,13 @@ plugins {
     alias(libs.plugins.secretsPlugin) apply false
 }
 
+buildscript {
+    dependencies {
+        classpath(libs.secrets.gradle.plugin)
+    }
+}
+
+
 subprojects {
     apply<SpotlessPlugin>()
     configure<SpotlessExtension> {

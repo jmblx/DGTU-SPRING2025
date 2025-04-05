@@ -1,6 +1,7 @@
 package bob.colbaskin.dgtu_spring2025.races.data
 
 import android.util.Log
+import bob.colbaskin.dgtu_spring2025.BuildConfig
 import bob.colbaskin.dgtu_spring2025.races.domain.RaceRepository
 import bob.colbaskin.dgtu_spring2025.races.domain.models.Race
 import bob.colbaskin.dgtu_spring2025.races.domain.models.Runner
@@ -14,7 +15,7 @@ import org.json.JSONObject
 
 class RaceRepositoryImpl : RaceRepository {
     override val socket: Socket by lazy {
-        IO.socket("https://fvbit.ru").apply {
+        IO.socket(BuildConfig.SOCKET_URL).apply {
             connect()
         }
     }

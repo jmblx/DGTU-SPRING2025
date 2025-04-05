@@ -30,8 +30,19 @@ class RacesViewModel @Inject constructor(
     private val _uiState = mutableStateOf<RaceUiState>(RaceUiState.Loading)
     val uiState: State<RaceUiState> = _uiState
 
+    private val _selectedRunner = mutableStateOf<Runner?>(null)
+    val selectedRunner: State<Runner?> = _selectedRunner
+
     init {
         observeRaces()
+    }
+
+    fun selectRunner(runner: Runner) {
+        _selectedRunner.value = runner
+    }
+
+    fun dismissRunnerDialog() {
+        _selectedRunner.value = null
     }
 
     private fun observeRaces() {
