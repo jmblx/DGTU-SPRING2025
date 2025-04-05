@@ -6,7 +6,7 @@ from application.runner.common.errors import (
     RunnerParameterValidationError,
 )
 from infrastructure.db.models import Runner
-from infrastructure.db.repositories.runner_repo import RunnerRepo
+from infrastructure.db.repositories.runner_repo import RunnerRepo, RunnerDTO
 
 
 @dataclass
@@ -23,7 +23,7 @@ class UpdateRunnerParametersHandler:
         self.runner_repo = runner_repo
         self.uow = uow
 
-    async def handle(self, command: UpdateRunnerParametersCommand) -> None:
+    async def handle(self, command: UpdateRunnerParametersCommand) -> RunnerDTO:
         runner = await self.runner_repo.get_runner(command.runner_id)
         if runner is None:
             raise RunnerNotFoundByID
@@ -34,12 +34,16 @@ class UpdateRunnerParametersHandler:
         ):
             raise RunnerParameterValidationError("No parameters provided for update.")
 
-        if command.reaction_time not in (None, 0) and not (0.1 <= command.reaction_time <= 0.3):
+        if command.reaction_time not in (None, 0) and not (
+            0.1 <= command.reaction_time <= 0.3
+        ):
             raise RunnerParameterValidationError(
                 f"Invalid reaction_time: {command.reaction_time}. Must be between 0.1 and 0.3 seconds."
             )
 
-        if command.acceleration not in (None, 0) and not (2 <= command.acceleration <= 10):
+        if command.acceleration not in (None, 0) and not (
+            2 <= command.acceleration <= 10
+        ):
             raise RunnerParameterValidationError(
                 f"Invalid acceleration: {command.acceleration}. Must be between 2 and 10 m/s^2."
             )
@@ -49,7 +53,9 @@ class UpdateRunnerParametersHandler:
                 f"Invalid max_speed: {command.max_speed}. Must be between 7 and 12 m/s."
             )
 
-        if command.speed_decay not in (None, 0) and not (0.05 <= command.speed_decay <= 0.5):
+        if command.speed_decay not in (None, 0) and not (
+            0.05 <= command.speed_decay <= 0.5
+        ):
             raise RunnerParameterValidationError(
                 f"Invalid speed_decay: {command.speed_decay}. Must be between 0.05 and 0.5."
             )
@@ -58,4 +64,6 @@ class UpdateRunnerParametersHandler:
             if key != "runner_id" and value not in (None, 0):
                 setattr(runner, key, value)
 
+        runner = await self.runner_repo.save(runner)
         await self.uow.commit()
+        return runner

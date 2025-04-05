@@ -57,7 +57,6 @@ class RaceStreamer:
                     runners: list[dict] = json.loads(race_data)
                     max_length = max(len(runner["progress"]) for runner in runners)
 
-                    # Очищаем предыдущих бегунов перед началом новой гонки
                     await sio.emit("clear_runners")
 
                     for i in range(max_length):
@@ -87,11 +86,9 @@ class RaceStreamer:
                         )
                         await asyncio.sleep(0.07)
 
-                    # Рассчитываем продолжительность стрима
                     self.stream_duration = time.time() - start_time
                     remaining_time = max(0, 25 - self.stream_duration - 0.1)
 
-                    # Отправляем информацию о завершении и времени до следующего стрима
                     await sio.emit(
                         "race_update",
                         {
