@@ -12,6 +12,7 @@ from core.config import config_loader
 from core.di.container import container
 from infrastructure.log.main import configure_logging
 from presentation.web_api.exceptions import setup_exception_handlers
+from presentation.web_api.middlwares import setup_middlewares
 from presentation.web_api.routes.runner_router import update_runner, runner_router
 
 
