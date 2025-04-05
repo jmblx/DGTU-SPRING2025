@@ -16,7 +16,7 @@ migrate:
 
 run:
 	cd src && \
-	uvicorn presentation.web_api.main:app --host 0.0.0.0
+	python3 -m presentation/
 
 migration:
 	alembic revision --autogenerate

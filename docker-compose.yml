@@ -17,9 +17,21 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
 
+  race_simulator:
+    build:
+      context: backend
+    entrypoint: python3 /backend/src/race_simulator.py
+    restart: always
+    volumes:
+      - ./backend:/backend
+    depends_on:
+      - redis
+      - db
+
   backend:
     build:
       context: backend
+    entrypoint: python3 /backend/src/socketio_room.py
     restart: always
     ports:
       - "8000:8000"
@@ -27,6 +39,16 @@ services:
       - ./backend:/backend
     depends_on:
       - redis
+      - db
+
+  migrations:
+    profiles: [ "migration" ]
+    build:
+      context: backend
+    command: [ "sh", "/backend/docker/migrate.sh" ]
+    volumes:
+      - ./backend:/backend
+    depends_on:
       - db
 
   nginx:

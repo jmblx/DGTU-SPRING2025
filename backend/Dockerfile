@@ -10,8 +10,6 @@ WORKDIR /backend
 COPY pyproject.toml ./
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir uv && \
-    uv pip install -e ".[dev]" --system
+    uv pip install -e . --system
 
 COPY . .
-
-ENTRYPOINT ["make", "run"]

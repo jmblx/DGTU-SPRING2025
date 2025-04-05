@@ -13,6 +13,7 @@ dependencies = [
     "redis>=5.2.0,<6.0.0",
     "python-socketio>=5.12.1",
     "pytz>=2025.2",
+    "colorlog>=6.9.0",
 ]
 
 [project.optional-dependencies]
@@ -23,7 +24,6 @@ dev = [
     "black>=24.8.0,<25.0.0",
     "pre-commit>=3.8.0,<4.0.0",
     "uvicorn>=0.34.0",
-    "colorlog>=6.9.0",
     "python-dotenv>=1.1.0",
     "pre-commit>=3.8.0",
 ]
