@@ -1,8 +1,11 @@
 package bob.colbaskin.dgtu_spring2025.races.presentation
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -11,8 +14,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import bob.colbaskin.dgtu_spring2025.probabilities.domain.models.convertToProbabilityWithSymbols
 import bob.colbaskin.dgtu_spring2025.probabilities.domain.models.probabilities
+import bob.colbaskin.dgtu_spring2025.ui.theme.CustomTheme
 import bob.colbaskin.dgtu_spring2025.utils.PreviewBox
 import com.breens.beetablescompose.BeeTablesCompose
 import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
@@ -35,16 +40,21 @@ import kotlinx.coroutines.runBlocking
 fun RaceAnalyticsScreen() {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
-        val titles = listOf("🔴", "🔵", "🟡", "🟢", "🟣", "⚫")
         val symbols = listOf("1", "2", "3", "4")
         item {
+            Text(
+                text = "Статистика по забегам",
+                color = CustomTheme.colors.text,
+                modifier = Modifier.padding(bottom = 2.dp)
+            )
             BeeTablesCompose(
                 data = convertToProbabilityWithSymbols(probabilities, symbols),
-                enableTableHeaderTitles = true,
+                enableTableHeaderTitles = false,
                 disableVerticalDividers = true,
-                headerTableTitles = titles,
+                headerTableTitles = listOf(""),
                 headerTitlesBackGroundColor = Color.DarkGray,
                 tableRowColors = listOf(
                     Color.LightGray,
@@ -55,12 +65,24 @@ fun RaceAnalyticsScreen() {
             )
         }
         item {
+            Text(
+                text = "Занятые места учеников по 10забегам",
+                color = CustomTheme.colors.text,
+                modifier = Modifier
+                    .padding(bottom = 2.dp)
+            )
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
                 JetpackComposeRaceChart()
             }
+            Text(
+                text = "Забег",
+                color = CustomTheme.colors.text,
+                modifier = Modifier
+                    .padding(top = 2.dp)
+            )
         }
     }
 }
@@ -161,4 +183,10 @@ private fun Preview() {
         }
     }
     PreviewBox { JetpackComposeRaceChart(modelProducer) }
+}
+
+@Preview
+@Composable
+fun Preview2() {
+    RaceAnalyticsScreen()
 }
