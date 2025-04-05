@@ -28,6 +28,12 @@ class UpdateRunnerParametersHandler:
         if runner is None:
             raise RunnerNotFoundByID
 
+        if all(
+            getattr(command, field) in (None, 0)
+            for field in ["reaction_time", "acceleration", "max_speed", "speed_decay"]
+        ):
+            raise RunnerParameterValidationError("No parameters provided for update.")
+
         if command.reaction_time not in (None, 0) and not (0.1 <= command.reaction_time <= 0.3):
             raise RunnerParameterValidationError(
                 f"Invalid reaction_time: {command.reaction_time}. Must be between 0.1 and 0.3 seconds."
