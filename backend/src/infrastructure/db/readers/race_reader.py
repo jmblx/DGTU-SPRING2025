@@ -11,8 +11,8 @@ class RaceData(TypedDict):
 
 
 
-# class RaceReader:
-#     def __init__(self, session: AsyncSession):
-#         self.session = session
-#
-#     async def
+class RaceReader:
+    def __init__(self, session: AsyncSession):
+        self.session = session
+
+    async def read_last_10_races

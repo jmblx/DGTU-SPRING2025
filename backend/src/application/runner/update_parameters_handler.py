@@ -28,25 +28,28 @@ class UpdateRunnerParametersHandler:
         if runner is None:
             raise RunnerNotFoundByID
 
-        if not (0.1 <= command.reaction_time <= 0.3) and not command.reaction_time == 0:
+        if command.reaction_time not in (None, 0) and not (0.1 <= command.reaction_time <= 0.3):
             raise RunnerParameterValidationError(
                 f"Invalid reaction_time: {command.reaction_time}. Must be between 0.1 and 0.3 seconds."
             )
-        if not (2 <= command.acceleration <= 10) and not command.acceleration == 0:
+
+        if command.acceleration not in (None, 0) and not (2 <= command.acceleration <= 10):
             raise RunnerParameterValidationError(
                 f"Invalid acceleration: {command.acceleration}. Must be between 2 and 10 m/s^2."
             )
-        if not (7 <= command.max_speed <= 12) and not command.max_speed == 0:
+
+        if command.max_speed not in (None, 0) and not (7 <= command.max_speed <= 12):
             raise RunnerParameterValidationError(
                 f"Invalid max_speed: {command.max_speed}. Must be between 7 and 12 m/s."
             )
-        if not (0.05 <= command.speed_decay <= 0.5) and not command.speed_decay == 0:
+
+        if command.speed_decay not in (None, 0) and not (0.05 <= command.speed_decay <= 0.5):
             raise RunnerParameterValidationError(
                 f"Invalid speed_decay: {command.speed_decay}. Must be between 0.05 and 0.5."
             )
 
         for key, value in command.__dict__.items():
-            if key not in ["runner_id"] and value not in (None, 0):
+            if key != "runner_id" and value not in (None, 0):
                 setattr(runner, key, value)
 
         await self.uow.commit()
