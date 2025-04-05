@@ -1,0 +1,52 @@
+# Crash log files
+hs_err_pid*
+
+# Java class files
+*.class
+
+# Ignore Gradle files
+.gradle/
+build/
+
+# generated files
+bin/
+gen/
+
+#  configuration
+.iws
+.ipr
+.iml
+# local configuration files
+local.properties
+
+# built generated package files
+*.apk
+*.ap_
+# Android Studio / IntelliJ IDEA
+*.iws
+.idea/
+/out/
+
+# OS temporary files
+.DS_Store
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# For eclipse Eclipse
+proguard/
+
+# Android Patch ###
+gen-external-apk
+libs
+
+# Packaging files
+*.jar
+*.war
+*.ear
+
+# Windows Installer files
+*.cab
+*.msi
+*.msm
