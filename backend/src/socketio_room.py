@@ -13,7 +13,7 @@ from starlette.responses import HTMLResponse
 
 from core.config import config_loader
 
-app = FastAPI()
+app = FastAPI(docs_url=None, redoc_url=None, openapi_url=None)
 
 sio = AsyncServer(cors_allowed_origins="*", async_mode="asgi")
 app.mount("/socket.io", socketio.ASGIApp(sio))

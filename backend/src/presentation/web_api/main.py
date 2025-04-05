@@ -32,7 +32,7 @@ def create_app() -> FastAPI:
     )
     setup_exception_handlers(app)
     app.include_router(runner_router)
-
+    setup_middlewares(app)
     return app
 
 

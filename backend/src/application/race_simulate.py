@@ -12,6 +12,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from infrastructure.db.models import Runner, Race, RaceResult
 
 DISTANCE = 100
+RANDOMNESS_FACTOR = 0.3
+MIN_SPEED_VARIATION = 0.8
+MAX_SPEED_VARIATION = 1.1
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -25,15 +28,19 @@ class RaceManager:
         self.redis = redis
 
     def simulate_race(
-        self, runners: list[Runner], time_step: float = 0.10
+        self, runners: list[Runner], time_step: float = 0.1
     ) -> list[tuple[Runner, float, list[float]]]:
-        """Симуляция гонки (чистая функция, не требует доступа к БД/Redis)"""
+        """Симуляция гонки с добавлением случайности в результаты"""
         start_time = perf_counter()
 
         progress = {runner.id: [] for runner in runners}
         finished = {runner.id: False for runner in runners}
         times = {runner.id: 0.0 for runner in runners}
         distances = {runner.id: 0.0 for runner in runners}
+        speed_multipliers = {
+            runner.id: random.uniform(MIN_SPEED_VARIATION, MAX_SPEED_VARIATION)
+            for runner in runners
+        }
 
         t = 0.0
         while not all(finished.values()):
@@ -43,6 +50,7 @@ class RaceManager:
 
                 t_effective = max(0.0, t - runner.reaction_time)
 
+                # Базовый расчет скорости
                 if t_effective < runner.max_speed / runner.acceleration:
                     speed = runner.acceleration * t_effective
                 else:
@@ -52,13 +60,18 @@ class RaceManager:
                     speed = runner.max_speed * (
                         1 - runner.speed_decay * time_after_accel
                     )
-                    speed = max(speed, 3.5)
+                    speed = max(speed, 3.0)
 
-                distances[runner.id] += speed * time_step
+                # Добавляем случайность к скорости
+                random_effect = 1 + (random.random() - 0.5) * RANDOMNESS_FACTOR
+                effective_speed = speed * speed_multipliers[runner.id] * random_effect
+
+                distances[runner.id] += effective_speed * time_step
 
                 if distances[runner.id] >= DISTANCE:
                     finished[runner.id] = True
                     distances[runner.id] = DISTANCE
+                    # Добавляем небольшую случайность к финишному времени
                     times[runner.id] = t + random.uniform(0.001, 0.009)
 
                 progress[runner.id].append(round(distances[runner.id], 2))
@@ -66,8 +79,8 @@ class RaceManager:
             t += time_step
 
         elapsed = perf_counter() - start_time
-        if elapsed < 25:
-            time_step = (25 - elapsed) / len(runners)
+        if elapsed < 30:
+            time_step = (30 - elapsed) / len(runners)
             for runner in runners:
                 progress[runner.id].extend([DISTANCE] * int(time_step / 0.1))
 
