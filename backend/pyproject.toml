@@ -11,6 +11,8 @@ dependencies = [
     "dishka>=1.4.0,<2.0.0",
     "gunicorn>=23.0.0,<24.0.0",
     "redis>=5.2.0,<6.0.0",
+    "python-socketio>=5.12.1",
+    "pytz>=2025.2",
 ]
 
 [project.optional-dependencies]

@@ -1,5 +1,7 @@
 from typing import NewType
 
+from dishka import Provider, Scope, provide
+
 from core.config import (
     AppConfig,
     DatabaseConfig,
@@ -8,7 +10,6 @@ from core.config import (
     RedisConfig,
     config_loader,
 )
-from dishka import Provider, Scope, provide
 
 LoggingConfig = NewType("LoggingConfig", dict)
 

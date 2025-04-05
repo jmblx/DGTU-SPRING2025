@@ -1,7 +1,6 @@
 import os
 from collections.abc import AsyncIterable
 
-from core.config import DatabaseConfig
 from dishka import Provider, Scope, provide
 from sqlalchemy import NullPool
 from sqlalchemy.ext.asyncio import (
@@ -10,6 +9,8 @@ from sqlalchemy.ext.asyncio import (
     async_sessionmaker,
     create_async_engine,
 )
+
+from core.config import DatabaseConfig
 
 
 class DBProvider(Provider):

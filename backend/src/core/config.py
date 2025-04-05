@@ -78,11 +78,12 @@ class ConfigLoader:
                 },
                 "root": {"handlers": ["console"], "level": "INFO"},
             }
-
+        redis = RedisConfig(**toml_data["redis"])
+        redis.uri = f"redis://{toml_data['redis']['host']}:{toml_data['redis']['port']}"
         cls._app_config = AppConfig(
             gunicorn=GunicornConfig(**toml_data["gunicorn"]),
             database=DatabaseConfig(**toml_data["database"]),
-            redis=RedisConfig(**toml_data["redis"]),
+            redis=redis,
             global_=GlobalConfig(**toml_data["global"]),
         )
         cls._logging_config = logging_config

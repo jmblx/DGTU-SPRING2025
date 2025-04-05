@@ -2,15 +2,17 @@ import logging
 from contextlib import asynccontextmanager
 from dataclasses import asdict
 
-from core.config import config_loader
-from core.di.container import container
 from dishka.integrations.fastapi import (
     setup_dishka,
 )
 from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
+
+from core.config import config_loader
+from core.di.container import container
 from infrastructure.log.main import configure_logging
 from presentation.web_api.exceptions import setup_exception_handlers
+from presentation.web_api.routes.race_router import race_router
 
 
 @asynccontextmanager
@@ -29,6 +31,8 @@ def create_app() -> FastAPI:
         default_response_class=ORJSONResponse,
     )
     setup_exception_handlers(app)
+    app.include_router(race_router)
+
     return app
 
 

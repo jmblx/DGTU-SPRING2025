@@ -4,13 +4,12 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from infrastructure.db.models import Base
 
 
-class Student(Base):
-    __tablename__ = "student"
+class Runner(Base):
+    __tablename__ = "runner"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     colour: Mapped[str] = mapped_column(String(20))
 
-    # Поля с типом Float (соответствует REAL в SQL)
     reaction_time: Mapped[float] = mapped_column(
         Float(precision=3, decimal_return_scale=2),
         nullable=False,
@@ -28,7 +27,7 @@ class Student(Base):
         nullable=False,
     )
 
-    race_results = relationship("RaceResult", uselist=True, back_populates="student")
+    race_results = relationship("RaceResult", uselist=True, back_populates="runner")
 
     def __repr__(self):
-        return f"<Student {self.colour}-{self.id}>"
+        return f"<Runner {self.colour}-{self.id}>"

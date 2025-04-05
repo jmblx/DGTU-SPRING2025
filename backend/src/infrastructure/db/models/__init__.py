@@ -1,6 +1,6 @@
-__all__ = ("Base", "Race", "RaceResult", "Student")
+__all__ = ("Base", "Race", "RaceResult", "Runner")
 
 from infrastructure.db.models.base import Base
 from infrastructure.db.models.race import Race
+from infrastructure.db.models.runner import Runner
 from infrastructure.db.models.secondary import RaceResult
-from infrastructure.db.models.student import Student

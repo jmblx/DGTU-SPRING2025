@@ -1,7 +1,8 @@
-from application.common.interfaces.uow import Uow
 from dishka import Provider, Scope, provide
-from infrastructure.db.uow import SAUnitOfWork
 from sqlalchemy.ext.asyncio import AsyncSession
+
+from application.common.interfaces.uow import Uow
+from infrastructure.db.uow import SAUnitOfWork
 
 
 class UowProvider(Provider):
