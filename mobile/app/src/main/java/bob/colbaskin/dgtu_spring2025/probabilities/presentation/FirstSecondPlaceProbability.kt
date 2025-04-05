@@ -11,7 +11,6 @@ import bob.colbaskin.dgtu_spring2025.probabilities.domain.models.probabilities
 
 import com.breens.beetablescompose.BeeTablesCompose
 
-
 @Composable
 fun FirstSecondPlaceProbability () {
     val titles = listOf("🔴", "🔵", "🟡", "🟢", "🟣", "⚫")
