@@ -61,10 +61,10 @@ def upgrade() -> None:
         },
         {
             'colour': 'жёлтый',
-            'reaction_time': 0.25,
-            'acceleration': 3.50,
-            'max_speed': 9.45,
-            'speed_decay': 0.150
+            'reaction_time': 0.23,
+            'acceleration': 3.60,
+            'max_speed': 9.75,
+            'speed_decay': 0.140
         },
         {
             'colour': 'зелёный',

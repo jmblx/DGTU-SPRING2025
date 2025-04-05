@@ -9,6 +9,10 @@ from starlette.requests import Request
 from starlette.status import HTTP_500_INTERNAL_SERVER_ERROR
 
 from application.common.errors.base import AppError
+from application.runner.common.errors import (
+    RunnerParameterValidationError,
+    RunnerNotFoundByID,
+)
 from presentation.web_api.responses import ErrorData, ErrorResponse
 
 logger = logging.getLogger(__name__)
@@ -16,9 +20,12 @@ logger = logging.getLogger(__name__)
 
 def setup_exception_handlers(app: FastAPI):
     app.add_exception_handler(AppError, error_handler(500))
-    # app.add_exception_handler(
-    #     InvalidRedirectURLError, error_handler(status.HTTP_400_BAD_REQUEST)
-    # )
+    app.add_exception_handler(
+        RunnerParameterValidationError, error_handler(status.HTTP_400_BAD_REQUEST)
+    )
+    app.add_exception_handler(
+        RunnerNotFoundByID, error_handler(status.HTTP_404_NOT_FOUND)
+    )
     app.add_exception_handler(Exception, unknown_exception_handler)
 
 

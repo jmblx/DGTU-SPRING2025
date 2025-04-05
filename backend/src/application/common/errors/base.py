@@ -13,4 +13,12 @@ class AppError(Exception):
         return "An app error occurred"
 
 
+class ApplicationError(AppError):
+    """Base Application Exception."""
+
+    @property
+    def title(self) -> str:
+        return "An application error occurred"
+
+
 class DomainError(AppError): ...

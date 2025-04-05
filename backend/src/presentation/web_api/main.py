@@ -12,7 +12,7 @@ from core.config import config_loader
 from core.di.container import container
 from infrastructure.log.main import configure_logging
 from presentation.web_api.exceptions import setup_exception_handlers
-from presentation.web_api.routes.race_router import race_router
+from presentation.web_api.routes.runner_router import update_runner, runner_router
 
 
 @asynccontextmanager
@@ -31,7 +31,7 @@ def create_app() -> FastAPI:
         default_response_class=ORJSONResponse,
     )
     setup_exception_handlers(app)
-    app.include_router(race_router)
+    app.include_router(runner_router)
 
     return app
 
