@@ -2,6 +2,7 @@ from dishka import AsyncContainer, FromDishka
 from dishka.integrations.fastapi import inject, DishkaRoute
 from fastapi import APIRouter
 
+from application.runner.get_all_runners_handler import GetAllRunnersHandler
 from application.runner.update_parameters_handler import (
     UpdateRunnerParametersHandler,
     UpdateRunnerParametersCommand,
@@ -22,8 +23,8 @@ async def update_runner(
         UpdateRunnerParametersCommand(runner_id=runner_id, **data.model_dump())
     )
 
-# @runner_router.get("")
-# async def get_runners(
-#     handler: FromDishka[GetAllRunnersHandler],
-# ):
-
+@runner_router.get("")
+async def get_runners(
+    handler: FromDishka[GetAllRunnersHandler],
+):
+    return await handler.handle()
