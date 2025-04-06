@@ -67,84 +67,80 @@ fun RaceAnimationScreen(viewModel: RacesViewModel = hiltViewModel()) {
 
 @Composable
 private fun RunnerParamsDialog(viewModel: RacesViewModel) {
-    viewModel.selectedRunnerId?.let { runnerId ->
+    val state by viewModel.runnerParamsState
+
+    state?.let { params ->
         AlertDialog(
             onDismissRequest = { viewModel.hideRunnerParams() },
-            title = { Text("Параметры бегуна #$runnerId") },
+            title = { Text("Параметры бегуна #${params.runnerId}") },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    OutlinedTextField(
-                        value = viewModel.reactionTime,
-                        onValueChange = { viewModel.reactionTime = it },
-                        label = { Text("Время реакции (сек)") },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        isError = viewModel.reactionTimeError != null
+                    ParamField(
+                        label = "Время реакции (сек)",
+                        value = params.params.reactionTime.toString(),
+                        error = params.errors[RunnerParamField.REACTION_TIME],
+                        onValueChange = { viewModel.updateParam(RunnerParamField.REACTION_TIME, it) }
                     )
-                    if (viewModel.reactionTimeError != null) {
-                        Text(viewModel.reactionTimeError!!, color = Color.Red)
-                    }
 
-                    OutlinedTextField(
-                        value = viewModel.acceleration,
-                        onValueChange = { viewModel.acceleration = it },
-                        label = { Text("Ускорение (м/с²)") },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        isError = viewModel.accelerationError != null
+                    ParamField(
+                        label = "Ускорение (м/с²)",
+                        value = params.params.acceleration.toString(),
+                        error = params.errors[RunnerParamField.ACCELERATION],
+                        onValueChange = { viewModel.updateParam(RunnerParamField.ACCELERATION, it) }
                     )
-                    if (viewModel.accelerationError != null) {
-                        Text(viewModel.accelerationError!!, color = Color.Red)
-                    }
 
-                    OutlinedTextField(
-                        value = viewModel.maxSpeed,
-                        onValueChange = { viewModel.maxSpeed = it },
-                        label = { Text("Макс. скорость (м/с)") },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        isError = viewModel.maxSpeedError != null
+                    ParamField(
+                        label = "Макс. скорость (м/с)",
+                        value = params.params.maxSpeed.toString(),
+                        error = params.errors[RunnerParamField.MAX_SPEED],
+                        onValueChange = { viewModel.updateParam(RunnerParamField.MAX_SPEED, it) }
                     )
-                    if (viewModel.maxSpeedError != null) {
-                        Text(viewModel.maxSpeedError!!, color = Color.Red)
-                    }
 
-                    OutlinedTextField(
-                        value = viewModel.speedDecay,
-                        onValueChange = { viewModel.speedDecay = it },
-                        label = { Text("Спад скорости (м/с²)") },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        isError = viewModel.speedDecayError != null
+                    ParamField(
+                        label = "Спад скорости (м/с²)",
+                        value = params.params.speedDecay.toString(),
+                        error = params.errors[RunnerParamField.SPEED_DECAY],
+                        onValueChange = { viewModel.updateParam(RunnerParamField.SPEED_DECAY, it) }
                     )
-                    if (viewModel.speedDecayError != null) {
-                        Text(viewModel.speedDecayError!!, color = Color.Red)
+
+                    params.error?.let {
+                        Text(text = it, color = Color.Red)
                     }
                 }
             },
             confirmButton = {
                 Button(
                     onClick = { viewModel.submitParams() },
-                    enabled = listOf(
-                        viewModel.reactionTime,
-                        viewModel.acceleration,
-                        viewModel.maxSpeed,
-                        viewModel.speedDecay
-                    ).all {
-                        it.isNotBlank() && viewModel.reactionTimeError == null
-                        && viewModel.accelerationError == null
-                        && viewModel.maxSpeedError == null
-                        && viewModel.speedDecayError == null
-                    }
-                ) {
-                    Text("Отправить")
-                }
+                    enabled = params.errors.isEmpty()
+                ) { Text("Сохранить") }
             },
             dismissButton = {
-                TextButton(onClick = {
-                    viewModel.hideRunnerParams()
-                    viewModel.showRunnerParams()
-                }) {
+                TextButton(onClick = { viewModel.hideRunnerParams() }) {
                     Text("Отмена")
                 }
             }
         )
+    }
+}
+
+@Composable
+private fun ParamField(
+    label: String,
+    value: String,
+    error: String?,
+    onValueChange: (String) -> Unit
+) {
+    Column {
+        OutlinedTextField(
+            value = value,
+            onValueChange = onValueChange,
+            label = { Text(label) },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            isError = error != null
+        )
+        error?.let {
+            Text(text = it, color = Color.Red)
+        }
     }
 }
 

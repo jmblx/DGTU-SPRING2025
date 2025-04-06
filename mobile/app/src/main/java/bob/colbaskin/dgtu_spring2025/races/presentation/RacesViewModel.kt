@@ -28,103 +28,111 @@ class RacesViewModel @Inject constructor(
     private val _uiState = mutableStateOf<RaceUiState>(RaceUiState.Loading)
     val uiState: State<RaceUiState> = _uiState
 
-    var selectedRunnerId by mutableStateOf<Int?>(null)
-        private set
+    private val _runnerParamsState = mutableStateOf<RunnerParamsState?>(null)
+    val runnerParamsState: State<RunnerParamsState?> = _runnerParamsState
 
-    var reactionTime by mutableStateOf("")
-    var acceleration by mutableStateOf("")
-    var maxSpeed by mutableStateOf("")
-    var speedDecay by mutableStateOf("")
-
-    var reactionTimeError by mutableStateOf<String?>(null)
-    var accelerationError by mutableStateOf<String?>(null)
-    var maxSpeedError by mutableStateOf<String?>(null)
-    var speedDecayError by mutableStateOf<String?>(null)
+    private var cachedParams by mutableStateOf<Map<Int, RunnerParamsDTO>>(emptyMap())
 
     init {
         observeRaces()
+        observeRunnerParams()
+        viewModelScope.launch {
+            Log.d("RacesViewModel", "${runnerRepository.getRunnersParams()}")
+        }
     }
 
-    fun showRunnerParams() {
-        reactionTime = ""
-        acceleration = ""
-        maxSpeed = ""
-        speedDecay = ""
-        reactionTimeError = null
-        accelerationError = null
-        maxSpeedError = null
-        speedDecayError = null
+    private fun observeRunnerParams() {
+        runnerRepository.observeParams()
+            .onEach { params ->
+                cachedParams = params
+                updateCurrentParamsState()
+            }
+            .launchIn(viewModelScope)
     }
 
-    fun hideRunnerParams() {
-        selectedRunnerId = null
-    }
-
-    fun submitParams() {
-        val isValid = validateInputs()
-
-        if (isValid) {
-            selectedRunnerId?.let { id ->
-                val params = RunnerParamsDTO(
-                    reactionTime = reactionTime.toDoubleOrNull() ?: 0.0,
-                    acceleration = acceleration.toDoubleOrNull() ?: 0.0,
-                    maxSpeed = maxSpeed.toDoubleOrNull() ?: 0.0,
-                    speedDecay = speedDecay.toDoubleOrNull() ?: 0.0
+    private fun updateCurrentParamsState() {
+        _runnerParamsState.value?.let { currentState ->
+            cachedParams[currentState.runnerId]?.let { newParams ->
+                _runnerParamsState.value = currentState.copy(
+                    params = newParams,
+                    errors = validateParams(newParams)
                 )
-                viewModelScope.launch {
-                    try {
-                        runnerRepository.putRunnerParams(id, params)
-                        hideRunnerParams()
-                    } catch (e: HttpException) {
-                        Log.e("API_ERROR", "Ошибка HTTP: ${e.code()} - ${e.message()}")
-                        Log.e("API_ERROR", "Тело ошибки: ${e.response()?.errorBody()?.string()}")
-                        _uiState.value = RaceUiState.Error("Ошибка: ${e.code()} - ${e.message()}")
-                    }
-                }
             }
         }
     }
 
-    private fun validateInputs(): Boolean {
-        var isValid = true
+    fun selectRunner(runner: Runner) {
+        val runnerId = runner.id.toIntOrNull() ?: return
+        val params = cachedParams[runnerId] ?: RunnerParamsDTO(
+            runnerId = runnerId,
+            reactionTime = 0.0,
+            acceleration = 0.0,
+            maxSpeed = 0.0,
+            speedDecay = 0.0
+        )
 
-        val reactionTimeValue = reactionTime.toDoubleOrNull()
-        if (reactionTimeValue == null || reactionTimeValue !in 0.1..0.3) {
-            reactionTimeError = "Время реакции должно быть между 0.1 и 0.3 сек."
-            isValid = false
-        } else {
-            reactionTimeError = null
-        }
-
-        val accelerationValue = acceleration.toDoubleOrNull()
-        if (accelerationValue == null || accelerationValue !in 2.0..10.0) {
-            accelerationError = "Ускорение должно быть между 2 и 10 м/с²."
-            isValid = false
-        } else {
-            accelerationError = null
-        }
-
-        val maxSpeedValue = maxSpeed.toDoubleOrNull()
-        if (maxSpeedValue == null || maxSpeedValue !in 7.0..12.0) {
-            maxSpeedError = "Макс. скорость должна быть между 7 и 12 м/с."
-            isValid = false
-        } else {
-            maxSpeedError = null
-        }
-
-        val speedDecayValue = speedDecay.toDoubleOrNull()
-        if (speedDecayValue == null || speedDecayValue !in 0.05..0.5) {
-            speedDecayError = "Спад скорости должен быть между 0.05 и 0.5 м/с²."
-            isValid = false
-        } else {
-            speedDecayError = null
-        }
-
-        return isValid
+        _runnerParamsState.value = RunnerParamsState(
+            runnerId = runnerId,
+            params = params,
+            errors = validateParams(params)
+        )
     }
 
-    fun selectRunner(runner: Runner) {
-        selectedRunnerId = runner.id.toIntOrNull()
+    fun updateParam(field: RunnerParamField, value: String) {
+        val currentState = _runnerParamsState.value ?: return
+        val newParams = currentState.params.copy().apply {
+            when(field) {
+                RunnerParamField.REACTION_TIME -> reactionTime = value.toDoubleOrNull() ?: 0.0
+                RunnerParamField.ACCELERATION -> acceleration = value.toDoubleOrNull() ?: 0.0
+                RunnerParamField.MAX_SPEED -> maxSpeed = value.toDoubleOrNull() ?: 0.0
+                RunnerParamField.SPEED_DECAY -> speedDecay = value.toDoubleOrNull() ?: 0.0
+            }
+        }
+
+        _runnerParamsState.value = currentState.copy(
+            params = newParams,
+            errors = validateParams(newParams)
+        )
+    }
+
+    private fun validateParams(params: RunnerParamsDTO): Map<RunnerParamField, String> {
+        val errors = mutableMapOf<RunnerParamField, String>()
+
+        if (params.reactionTime !in 0.1..0.3) {
+            errors[RunnerParamField.REACTION_TIME] = "Должно быть между 0.1 и 0.3 сек"
+        }
+        if (params.acceleration !in 2.0..10.0) {
+            errors[RunnerParamField.ACCELERATION] = "Должно быть между 2 и 10 м/с²"
+        }
+        if (params.maxSpeed !in 7.0..12.0) {
+            errors[RunnerParamField.MAX_SPEED] = "Должно быть между 7 и 12 м/с"
+        }
+        if (params.speedDecay !in 0.05..0.5) {
+            errors[RunnerParamField.SPEED_DECAY] = "Должно быть между 0.05 и 0.5 м/с²"
+        }
+
+        return errors
+    }
+
+    fun submitParams() {
+        val currentState = _runnerParamsState.value ?: return
+        if (currentState.errors.isNotEmpty()) return
+
+        viewModelScope.launch {
+            try {
+                runnerRepository.putRunnerParams(currentState.runnerId, currentState.params)
+                _runnerParamsState.value = null
+            } catch (e: HttpException) {
+                _runnerParamsState.value = currentState.copy(
+                    error = "Ошибка сохранения: ${e.code()} - ${e.message()}"
+                )
+                Log.e("API_ERROR", "Ошибка HTTP", e)
+            }
+        }
+    }
+
+    fun hideRunnerParams() {
+        _runnerParamsState.value = null
     }
 
     private fun observeRaces() {
@@ -142,6 +150,19 @@ class RacesViewModel @Inject constructor(
             }
             .launchIn(viewModelScope)
     }
+}
+
+data class RunnerParamsState(
+    val runnerId: Int,
+    val params: RunnerParamsDTO,
+    val errors: Map<RunnerParamField, String>,
+    val error: String? = null
+) {
+    fun isValid() = errors.isEmpty()
+}
+
+enum class RunnerParamField {
+    REACTION_TIME, ACCELERATION, MAX_SPEED, SPEED_DECAY
 }
 
 sealed class RaceUiState {

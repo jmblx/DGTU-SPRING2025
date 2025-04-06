@@ -5,8 +5,9 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class RunnerParamsDTO(
-    @SerialName("reaction_time") val reactionTime: Double,
-    val acceleration: Double,
-    @SerialName("max_speed") val maxSpeed: Double,
-    @SerialName("speed_decay") val speedDecay: Double
+    @SerialName("runner_id") val runnerId: Int,
+    @SerialName("reaction_time") var reactionTime: Double,
+    var acceleration: Double,
+    @SerialName("max_speed") var maxSpeed: Double,
+    @SerialName("speed_decay") var speedDecay: Double
 )

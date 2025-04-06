@@ -9,6 +9,10 @@ class RunnerRepositoryImpl @Inject constructor(
     val runnerApi: RunnerApiService
 ): RunnerRepository {
 
+    override suspend fun getRunnersParams(): List<RunnerParamsDTO> {
+        return runnerApi.getRunnersParams()
+    }
+
     override suspend fun putRunnerParams(id: Int, request: RunnerParamsDTO) {
         runnerApi.putRunnerParams(id, request)
     }

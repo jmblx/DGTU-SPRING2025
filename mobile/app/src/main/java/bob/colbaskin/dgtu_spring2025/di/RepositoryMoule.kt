@@ -9,7 +9,6 @@ import bob.colbaskin.dgtu_spring2025.races.domain.remote.RunnerRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 
 import retrofit2.Retrofit
