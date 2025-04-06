@@ -19,22 +19,28 @@ class RaceReader:
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def read_last_10_races(self) -> dict[int, RacePositions]:
-        """Возвращает данные в формате TypedDict (10 последних гонок, исключая самую последнюю)"""
+    async def read_last_10_races(self, last_race_id: int) -> dict[int, RacePositions]:
+        """
+        Возвращает данные в формате TypedDict:
+        10 гонок, которые были до указанной, исключая её саму.
+        """
+        race_obj = await self.session.get(Race, last_race_id)
+        if not race_obj:
+            return {}
+
         result = await self.session.execute(
             select(Race)
+            .where(Race.start_time < race_obj.start_time)
             .order_by(desc(Race.start_time))
-            .limit(11)  # Получаем 11 последних
+            .limit(10)
             .options(joinedload(Race.results))
             .execution_options(populate_existing=True)
         )
 
         races = result.unique().scalars().all()
 
-        last_races = races[1:]
-
         races_data: dict[int, RacePositions] = {}
-        for race in last_races:
+        for race in races:
             positions: RacePositions = {
                 result.runner_id: result.position for result in race.results
             }

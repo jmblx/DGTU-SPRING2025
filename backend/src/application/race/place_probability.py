@@ -1,17 +1,23 @@
 import random
-from typing import Dict, List
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
 
-from application.race_simulate import MIN_SPEED_VARIATION, MAX_SPEED_VARIATION, RANDOMNESS_FACTOR, DISTANCE
+from application.race_simulate import (
+    DISTANCE,
+    MAX_SPEED_VARIATION,
+    MIN_SPEED_VARIATION,
+    RANDOMNESS_FACTOR,
+)
 from infrastructure.db.models import Runner
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 
 class RaceProbabilityCalculator:
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def calculate_win_probabilities(self, num_simulations: int = 1000) -> Dict[int, Dict[int, float]]:
+    async def calculate_win_probabilities(
+        self, num_simulations: int = 1000
+    ) -> dict[int, dict[int, float]]:
         """
         Рассчитывает вероятности занятых мест для каждого бегуна
         Возвращает словарь: {runner_id: {position: probability}}
@@ -39,7 +45,9 @@ class RaceProbabilityCalculator:
 
         return probabilities
 
-    def _simulate_single_race(self, runners: List[Runner]) -> List[tuple[Runner, float, list[float]]]:
+    def _simulate_single_race(
+        self, runners: list[Runner]
+    ) -> list[tuple[Runner, float, list[float]]]:
         """Упрощенная симуляция одной гонки без прогресса"""
         times = {}
 
@@ -48,7 +56,9 @@ class RaceProbabilityCalculator:
 
             acceleration_time = runner.max_speed / runner.acceleration
 
-            remaining_distance = DISTANCE - (0.5 * runner.acceleration * acceleration_time ** 2)
+            remaining_distance = DISTANCE - (
+                0.5 * runner.acceleration * acceleration_time**2
+            )
             if remaining_distance > 0:
                 decay_time = remaining_distance / runner.max_speed
             else:
@@ -57,7 +67,9 @@ class RaceProbabilityCalculator:
             random_factor = random.uniform(MIN_SPEED_VARIATION, MAX_SPEED_VARIATION)
             total_time = (reaction_time + acceleration_time + decay_time) * random_factor
 
-            times[runner.id] = total_time * (1 + (random.random() - 0.5) * RANDOMNESS_FACTOR)
+            times[runner.id] = total_time * (
+                1 + (random.random() - 0.5) * RANDOMNESS_FACTOR
+            )
 
         sorted_runners = sorted(runners, key=lambda r: times[r.id])
 
