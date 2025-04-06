@@ -2,6 +2,7 @@ import logging
 from typing import TypedDict
 
 from infrastructure.db.models import Race
+from redis.asyncio import Redis
 from sqlalchemy import desc, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
@@ -16,15 +17,21 @@ class RacePositions(TypedDict):
 
 
 class RaceReader:
-    def __init__(self, session: AsyncSession):
+    def __init__(self, session: AsyncSession, redis: Redis):
         self.session = session
+        self.redis = redis
 
-    async def read_last_10_races(self, last_race_id: int) -> dict[int, RacePositions]:
-        """
-        Возвращает данные в формате TypedDict:
-        10 гонок, которые были до указанной, исключая её саму.
-        """
-        race_obj = await self.session.get(Race, last_race_id)
+    async def read_last_10_races(self) -> dict[int, RacePositions]:
+        current_id_raw = await self.redis.get("current_streaming_id")
+        if not current_id_raw:
+            return {}
+
+        try:
+            current_id = int(current_id_raw)
+        except ValueError:
+            return {}
+
+        race_obj = await self.session.get(Race, current_id)
         if not race_obj:
             return {}
 
