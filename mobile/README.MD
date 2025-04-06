@@ -21,32 +21,34 @@
 Темная тема
 <p align="center">
   <img src="screenshots/1.jpg" alt="Главный экран - Симуляция забега" width="125" />
-  <img src="screenshots/2-dark.jpg.jpg" alt="Таблица результатов" width="125" />
-  <img src="screenshots/3-dark.jpg.jpg" alt="Визуализация забега" width="125" />
-  <img src="screenshots/4-dark.jpg.jpg" alt="Анализ вероятностей" width="125" />
-  <img src="screenshots/5-dark.jpg.jpg" alt="Анализ вероятностей" width="125" />
+  <img src="screenshots/2-dark.jpg" alt="Таблица результатов" width="125" />
+  <img src="screenshots/3-dark.jpg" alt="Визуализация забега" width="125" />
+  <img src="screenshots/4-dark.jpg" alt="Анализ вероятностей" width="125" />
+  <img src="screenshots/5-dark.jpg" alt="Анализ вероятностей" width="125" />
 </p>
 
 Светлая тема
 <p align="center">
-  <img src="screenshots/2-дшпре.jpg.jpg" alt="Таблица результатов" width="125" />
-  <img src="screenshots/3-дшпре.jpg.jpg" alt="Визуализация забега" width="125" />
-  <img src="screenshots/4-дшпре.jpg.jpg" alt="Анализ вероятностей" width="125" />
-  <img src="screenshots/5-дшпре.jpg.jpg" alt="Анализ вероятностей" width="125" />
+  <img src="screenshots/2-дшпре.jpg" alt="Таблица результатов" width="125" />
+  <img src="screenshots/3-дшпре.jpg" alt="Визуализация забега" width="125" />
+  <img src="screenshots/4-дшпре.jpg" alt="Анализ вероятностей" width="125" />
+  <img src="screenshots/5-дшпре.jpg" alt="Анализ вероятностей" width="125" />
 </p>
 
 ## Используемые технологии
-| Технология                         | Описание                                                                                          |
-|------------------------------------|---------------------------------------------------------------------------------------------------|
-| **Jetpack Compose**                | Фреймворк для создания пользовательского интерфейса на Android                                     | |
-| **OkHttp**                         | HTTP-клиент для запросов и получения данных от сервера                                            |
-| **Dagger - Hilt**                  | Внедрение зависимостей для управления зависимостями в приложении                                   |
-| **WorkManager**                    | Управление фоновыми задачами и синхронизацией данных между устройствами                          |
-| **Clean Architecture**             | Архитектурный шаблон для организации чистой и масштабируемой кодовой базы                        |
+| Технология                    | Описание                                                                  |
+|-------------------------------|---------------------------------------------------------------------------|
+| **Jetpack Compose**           | Фреймворк для создания пользовательского интерфейса на Android            | |
+| **OkHttp**                    | HTTP-клиент для запросов и получения данных от сервера                    |
+| **Dagger - Hilt**             | Внедрение зависимостей для управления зависимостями в приложении          |
+| **WorkManager**               | Управление фоновыми задачами и синхронизацией данных между устройствами   |
+| **Socket.IO**                 | Реальная трансляция данных забега через Socket соединение                 |
+| **Spotless + GitHub Actions** | Автоматическая проверка кода при pull реквесте                            |
+| **Clean Architecture + MVVM** | Архитектурный шаблон для организации чистой и масштабируемой кодовой базы |
 
 ## Установка
 <p align="center"> <img src="screenshots/qr.png" alt="Главный экран - Симуляция забега" width="125" /> </p>
-Или скачать по ссылке на RuStore[https://www.rustore.ru/catalog/app/bob.colbaskin.dgtu_spring2025]
+<p align="center">Или скачать по ссылке на [RuStore](https://www.rustore.ru/catalog/app/bob.colbaskin.dgtu_spring2025) </p>
 
 ## Портфолио
-Для более подробного ознакомления с проектом и другими моими работами, вы можете посетить мое портфолио на Behance[https://www.behance.net/gallery/222004489/Android-Developer-Portfolio].
+Для более подробного ознакомления с проектом и другими моими работами, вы можете посетить мое портфолио на [Behance](https://www.behance.net/gallery/222004489/Android-Developer-Portfolio).
