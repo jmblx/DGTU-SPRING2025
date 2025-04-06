@@ -18,7 +18,7 @@
 5. Интерактивный интерфейс с возможностью изменения гиперпараметров учеников.
 
 ## Скриншоты
-Темная тема
+### Темная тема
 <p align="center">
   <img src="screenshots/1.jpg" alt="Главный экран - Симуляция забега" width="125" />
   <img src="screenshots/2-dark.jpg" alt="Таблица результатов" width="125" />
@@ -27,12 +27,12 @@
   <img src="screenshots/5-dark.jpg" alt="Анализ вероятностей" width="125" />
 </p>
 
-Светлая тема
+### Светлая тема
 <p align="center">
-  <img src="screenshots/2-дшпре.jpg" alt="Таблица результатов" width="125" />
-  <img src="screenshots/3-дшпре.jpg" alt="Визуализация забега" width="125" />
-  <img src="screenshots/4-дшпре.jpg" alt="Анализ вероятностей" width="125" />
-  <img src="screenshots/5-дшпре.jpg" alt="Анализ вероятностей" width="125" />
+  <img src="screenshots/2-light.jpg" alt="Таблица результатов" width="125" />
+  <img src="screenshots/3-light.jpg" alt="Визуализация забега" width="125" />
+  <img src="screenshots/4-light.jpg" alt="Анализ вероятностей" width="125" />
+  <img src="screenshots/5-light.jpg" alt="Анализ вероятностей" width="125" />
 </p>
 
 ## Используемые технологии
