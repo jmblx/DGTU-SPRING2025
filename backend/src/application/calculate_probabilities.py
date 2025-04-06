@@ -27,10 +27,8 @@ class ProbabilityCalculatorService:
         while self.is_running:
             try:
                 need_recalculate = await self.redis.get("recalculate_place_probability")
-                logger.info(f"Need to recalculate probabilities: {need_recalculate}")
 
                 if need_recalculate in ("1", "true", "True", 1):
-                    logger.info("Starting probability recalculation...")
                     await self.redis.set("recalculate_place_probability", "0")
 
                     runners = await self._get_current_runners()

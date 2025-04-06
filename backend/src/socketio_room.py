@@ -32,20 +32,16 @@ class RaceStreamer:
                 current_race_id = await redis_client.get("current_race_id")
                 if not current_race_id:
                     logger.info("No current race ID found, waiting...")
-                    # Удаляем ID текущего стрима, если нет активной гонки
                     await redis_client.delete("current_streaming_id")
                     await asyncio.sleep(0.1)
                     continue
 
                 current_race_id = current_race_id.decode("utf-8")
 
-                # Если гонка уже обрабатывалась, пропускаем
                 if current_race_id == self.last_race_id:
                     await asyncio.sleep(0.1)
                     continue
-
                 logger.info(f"Processing race ID: {current_race_id}")
-                # Сохраняем ID текущего стрима в Redis
                 await redis_client.set("current_streaming_id", current_race_id)
 
                 race_data = await redis_client.get(f"race:{current_race_id}:results")

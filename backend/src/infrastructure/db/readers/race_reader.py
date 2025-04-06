@@ -23,13 +23,34 @@ class RaceReader:
         self.cache_key = "last_10_races_cache"
 
     async def read_last_10_races(self) -> dict[int, RacePositions]:
-        cached_data = await self._get_from_cache()
-        if cached_data is not None:
+        current_id_raw = await self.redis.get("current_streaming_id")
+        cached_raw = await self.redis.get(self.cache_key)
+
+        is_cached_valid = False
+        cached_data: dict[int, RacePositions] = {}
+
+        if cached_raw:
+            try:
+                cached_data = json.loads(cached_raw)
+                if isinstance(cached_data, dict) and cached_data:
+                    is_cached_valid = True
+            except Exception as e:
+                logger.warning(f"Cache corrupted or invalid: {e}")
+
+        try:
+            current_id = int(current_id_raw) if current_id_raw else None
+        except ValueError:
+            current_id = None
+
+        if is_cached_valid and current_id and str(current_id - 1) in cached_data.keys():
+            logger.info("Using cached data.")
             return cached_data
 
-        races_data = await self._load_from_db()
+        logger.info("Cache or current_streaming_id is missing or invalid. Loading from DB.")
 
-        await self._save_to_cache(races_data)
+        races_data = await self._load_from_db(current_id)
+        if races_data:
+            await self._save_to_cache(races_data)
 
         return races_data
 
@@ -54,15 +75,8 @@ class RaceReader:
         except Exception as e:
             logger.error(f"Error saving to cache: {e}")
 
-    async def _load_from_db(self) -> dict[int, RacePositions]:
-        """Загружает данные из базы данных"""
-        current_id_raw = await self.redis.get("current_streaming_id")
-        if not current_id_raw:
-            return {}
-
-        try:
-            current_id = int(current_id_raw)
-        except ValueError:
+    async def _load_from_db(self, current_id: int | None) -> dict[int, RacePositions]:
+        if not current_id:
             return {}
 
         race_obj = await self.session.get(Race, current_id)

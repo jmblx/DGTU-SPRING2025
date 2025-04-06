@@ -1,3 +1,4 @@
+import logging
 import tomllib
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -43,6 +44,9 @@ class AppConfig:
     global_: GlobalConfig
 
 
+logger = logging.getLogger("core.config")
+
+
 class ConfigLoader:
     _instance = None
 
@@ -80,6 +84,7 @@ class ConfigLoader:
             }
         redis = RedisConfig(**toml_data["redis"])
         redis.uri = f"redis://{toml_data['redis']['host']}:{toml_data['redis']['port']}"
+        logger.info(toml_data['database'])
         cls._app_config = AppConfig(
             gunicorn=GunicornConfig(**toml_data["gunicorn"]),
             database=DatabaseConfig(**toml_data["database"]),
