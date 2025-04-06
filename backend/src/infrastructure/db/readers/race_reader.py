@@ -124,7 +124,3 @@ class RaceReader:
             await self.redis.set(cache_key, img_data, ex=3600)  # Кэш на 1 час
 
         return img_data
-
-    async def get_runner_history_chart(self, runner_id: int) -> str:
-
-        return await self.chart_generator.generate_history_chart(runner_id)

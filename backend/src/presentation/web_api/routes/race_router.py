@@ -32,21 +32,3 @@ async def get_race_chart(
         </body>
     </html>
     """
-
-
-@race_router.get("/runners/{runner_id}/history", response_class=HTMLResponse)
-async def get_runner_history(
-    runner_id: int,
-    reader: FromDishka[RaceReader]
-):
-    img_data = await reader.get_runner_history_chart(runner_id)
-    if not img_data:
-        raise HTTPException(status_code=404, detail="Runner not found")
-
-    return f"""
-    <html>
-        <body>
-            <img src="data:image/png;base64,{img_data}" />
-        </body>
-    </html>
-    """
