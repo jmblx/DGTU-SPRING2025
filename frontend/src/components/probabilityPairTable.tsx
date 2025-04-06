@@ -76,7 +76,9 @@ const PairProbabilityTable = () => {
                         }
 
                         const probability = pairMatrix[rowRunnerId]?.[`runner_${colRunnerId}`];
-                        const displayValue = probability !== null ? probability.toFixed(4) : '-';
+                        const displayValue = probability !== null && probability !== undefined
+                            ? probability.toFixed(4)
+                            : '-';
 
                         return (
                             <td key={`${rowRunnerId}-${colRunnerId}`}>
