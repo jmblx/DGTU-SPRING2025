@@ -12,19 +12,16 @@ probability_router = APIRouter(route_class=DishkaRoute, tags=["probability"], pr
 
 @probability_router.get("", response_model=ProbabilityResponse)
 async def get_probabilities(redis: FromDishka[Redis]):
-    # Получаем данные из Redis
     position_data = await redis.get("position_probability_cache")
     top2_data = await redis.get("top2_probability_cache")
     top3_data = await redis.get("top3_probability_cache")
     pair_data = await redis.get("pair_matrix_cache")
 
-    # Парсим JSON
     position_probs = json.loads(position_data) if position_data else {}
     top2_probs = json.loads(top2_data) if top2_data else {}
     top3_probs = json.loads(top3_data) if top3_data else {}
     pair_probs = json.loads(pair_data) if pair_data else {}
 
-    # Преобразуем данные в структуру Pydantic
     response = ProbabilityResponse(
         position_probabilities={
             int(runner_id): PositionProbability(

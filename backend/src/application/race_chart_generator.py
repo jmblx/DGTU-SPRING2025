@@ -43,7 +43,6 @@ class RaceChartGenerator:
             for race_result, runner in results:
                 runners.append(f"Runner {runner.id}")
                 times.append(race_result.finish_time)
-                # Переводим цвет
                 color = self.COLOR_TRANSLATIONS.get(runner.colour.lower(), "gray")
                 colors.append(color)
 
@@ -55,7 +54,6 @@ class RaceChartGenerator:
             plt.xlabel("Finish Time (seconds)")
             plt.tight_layout()
 
-            # Конвертируем в base64
             buffer = io.BytesIO()
             plt.savefig(buffer, format='png')
             buffer.seek(0)

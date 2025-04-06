@@ -35,10 +35,8 @@ class ProbabilityCalculatorService:
                     if not runners:
                         continue
 
-                    # Основные расчеты
                     probabilities = await self._calculate_all_probabilities(runners)
 
-                    # Сохраняем все результаты в Redis
                     await self._store_probabilities(probabilities)
                     logger.info("All probabilities updated in cache")
 
@@ -52,7 +50,6 @@ class ProbabilityCalculatorService:
         """Вычисляет все типы вероятностей, включая матрицу пар 1-2 мест"""
         runner_ids = [runner.id for runner in runners]
 
-        # Инициализация счетчиков
         position_counts = {runner_id: [0] * len(runners) for runner_id in runner_ids}
         top2_counts = {runner_id: 0 for runner_id in runner_ids}
         top3_counts = {runner_id: 0 for runner_id in runner_ids}
@@ -61,7 +58,6 @@ class ProbabilityCalculatorService:
         for _ in range(n_simulations):
             results = self._simulate_race(runners)
 
-            # Основные позиции
             for pos, (runner, _) in enumerate(results, start=1):
                 position_counts[runner.id][pos - 1] += 1
 
@@ -109,7 +105,6 @@ class ProbabilityCalculatorService:
             self.redis.set("pair_matrix_cache", json.dumps(probabilities["pair_matrix"]), ex=3600)
         )
 
-    # Остальные методы остаются без изменений
     async def stop(self):
         self.is_running = False
 

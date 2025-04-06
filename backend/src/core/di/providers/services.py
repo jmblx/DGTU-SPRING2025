@@ -5,7 +5,6 @@ from dishka import Provider, Scope, provide
 
 
 class ServiceProvider(Provider):
-    # calc = provide(Calculate, scope=Scope.REQUEST, provides=Calculate)
     race_manager = provide(RaceManager, scope=Scope.REQUEST, provides=RaceManager)
     probability_calculator_service = provide(
         ProbabilityCalculatorService,

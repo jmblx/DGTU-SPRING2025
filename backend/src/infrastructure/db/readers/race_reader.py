@@ -117,7 +117,7 @@ class RaceReader:
         cache_key = f"race_chart:{race_id}"
         cached = await self.redis.get(cache_key)
         if cached:
-            return cached.decode('utf-8')
+            return cached
 
         img_data = await self.chart_generator.generate_race_chart(race_id)
         if img_data:
