@@ -53,6 +53,17 @@ services:
       - redis
       - db
 
+  probability_calculator:
+    build:
+      context: backend
+    entrypoint: python3 /backend/src/place_probabilities.py
+    restart: always
+    volumes:
+      - ./backend:/backend
+    depends_on:
+      - redis
+      - db
+
   migrations:
     profiles: [ "migration" ]
     build:

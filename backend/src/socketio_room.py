@@ -6,12 +6,10 @@ from threading import Thread
 
 import socketio
 import uvicorn
+from core.config import config_loader
 from fastapi import FastAPI
 from redis.asyncio import Redis
 from socketio import AsyncServer
-from starlette.responses import HTMLResponse
-
-from core.config import config_loader
 
 app = FastAPI(docs_url=None, redoc_url=None, openapi_url=None)
 
@@ -34,6 +32,8 @@ class RaceStreamer:
                 current_race_id = await redis_client.get("current_race_id")
                 if not current_race_id:
                     logger.info("No current race ID found, waiting...")
+                    # Удаляем ID текущего стрима, если нет активной гонки
+                    await redis_client.delete("current_streaming_id")
                     await asyncio.sleep(0.1)
                     continue
 
@@ -45,6 +45,9 @@ class RaceStreamer:
                     continue
 
                 logger.info(f"Processing race ID: {current_race_id}")
+                # Сохраняем ID текущего стрима в Redis
+                await redis_client.set("current_streaming_id", current_race_id)
+
                 race_data = await redis_client.get(f"race:{current_race_id}:results")
 
                 if not race_data:
@@ -57,7 +60,6 @@ class RaceStreamer:
                     runners: list[dict] = json.loads(race_data)
                     max_length = max(len(runner["progress"]) for runner in runners)
 
-                    # Очищаем предыдущих бегунов перед началом новой гонки
                     await sio.emit("clear_runners")
 
                     for i in range(max_length):
@@ -87,11 +89,9 @@ class RaceStreamer:
                         )
                         await asyncio.sleep(0.07)
 
-                    # Рассчитываем продолжительность стрима
                     self.stream_duration = time.time() - start_time
                     remaining_time = max(0, 25 - self.stream_duration - 0.1)
 
-                    # Отправляем информацию о завершении и времени до следующего стрима
                     await sio.emit(
                         "race_update",
                         {
@@ -116,184 +116,18 @@ class RaceStreamer:
 
                 except json.JSONDecodeError:
                     logger.error(f"Error decoding JSON for race {current_race_id}")
+                    await redis_client.delete("current_streaming_id")
                 except Exception as e:
                     logger.error(f"Error processing race data: {e!s}")
+                    await redis_client.delete("current_streaming_id")
 
             except Exception as e:
                 logger.error(f"Error in main loop: {e!s}")
+                await redis_client.delete("current_streaming_id")
                 await asyncio.sleep(0.1)
 
 
-# Создаем единственный экземпляр RaceStreamer
 race_streamer = RaceStreamer()
-
-
-@app.get("/", response_class=HTMLResponse)
-async def get():
-    html_content = """
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <title>Race Simulation</title>
-        <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
-        <style>
-            .race-info {
-                margin-bottom: 20px;
-                padding: 10px;
-                background-color: #f0f0f0;
-                border-radius: 5px;
-            }
-            .runner {
-                margin: 10px;
-                padding: 10px;
-                border: 1px solid #ccc;
-                border-radius: 5px;
-            }
-            .progress-container {
-                width: 100%;
-                background-color: #f1f1f1;
-                border-radius: 5px;
-                margin-top: 5px;
-            }
-            .progress-bar {
-                height: 20px;
-                border-radius: 5px;
-                background-color: #4CAF50;
-                text-align: center;
-                line-height: 20px;
-                color: white;
-            }
-            .finished {
-                background-color: #2196F3;
-            }
-            .waiting {
-                padding: 20px;
-                text-align: center;
-                font-size: 1.2em;
-                color: #666;
-            }
-            .stream-info {
-                margin-top: 20px;
-                padding: 15px;
-                background-color: #e9f7ef;
-                border-radius: 5px;
-                font-size: 1.1em;
-            }
-            .countdown {
-                font-weight: bold;
-                color: #2e7d32;
-            }
-        </style>
-    </head>
-    <body>
-        <h1>Live Race Updates</h1>
-        <div id="race-info" class="race-info">
-            Current race: <span id="current-race-id">-</span>
-        </div>
-        <div id="runners-container"></div>
-        <div id="stream-info" class="stream-info" style="display: none;">
-            Stream duration: <span id="stream-duration">0</span>s | 
-            Next stream in: <span id="next-stream" class="countdown">0</span>s
-        </div>
-        <div id="waiting-message" class="waiting" style="display: none;">
-            Waiting for next race data...
-        </div>
-
-        <script>
-            const socket = io('http://localhost:8000');
-            const runnersContainer = document.getElementById('runners-container');
-            const currentRaceIdElement = document.getElementById('current-race-id');
-            const waitingMessage = document.getElementById('waiting-message');
-            const streamInfo = document.getElementById('stream-info');
-            const streamDurationElement = document.getElementById('stream-duration');
-            const nextStreamElement = document.getElementById('next-stream');
-
-            let runners = {};
-            let currentRaceId = null;
-            let countdownInterval = null;
-
-            function startCountdown(seconds) {
-                if (countdownInterval) clearInterval(countdownInterval);
-
-                let remaining = Math.round(seconds);
-                nextStreamElement.textContent = remaining;
-
-                countdownInterval = setInterval(() => {
-                    remaining -= 1;
-                    if (remaining >= 0) {
-                        nextStreamElement.textContent = remaining;
-                    } else {
-                        clearInterval(countdownInterval);
-                    }
-                }, 1000);
-            }
-
-            // Очистка бегунов при новой гонке
-            socket.on('clear_runners', () => {
-                runnersContainer.innerHTML = '';
-                runners = {};
-            });
-
-            socket.on('race_update', (data) => {
-                if (data.stream_complete) {
-                    // Показываем информацию о стриме и времени до следующего
-                    streamInfo.style.display = 'block';
-                    streamDurationElement.textContent = data.stream_duration.toFixed(2);
-                    startCountdown(data.next_stream_in);
-                    return;
-                }
-
-                // Если это новая гонка, обновляем ID
-                if (data.race_id !== currentRaceId) {
-                    currentRaceId = data.race_id;
-                    currentRaceIdElement.textContent = data.race_id;
-                    waitingMessage.style.display = 'none';
-                    streamInfo.style.display = 'none';
-                }
-
-                data.runners.forEach(runner => {
-                    if (!runners[runner.runner_id]) {
-                        const runnerDiv = document.createElement('div');
-                        runnerDiv.className = 'runner';
-                        runnerDiv.id = `runner-${runner.runner_id}`;
-                        runnerDiv.innerHTML = `
-                            <h3>Runner ${runner.runner_id}</h3>
-                            <p>Time: <span class="time">${runner.time.toFixed(2)}</span>s</p>
-                            <div class="progress-container">
-                                <div class="progress-bar" style="width: ${runner.current_progress}%">
-                                    ${runner.current_progress.toFixed(1)}%
-                                </div>
-                            </div>
-                            <p class="status">${runner.finished ? 'Finished!' : 'Running...'}</p>
-                        `;
-                        runnersContainer.appendChild(runnerDiv);
-                        runners[runner.runner_id] = runnerDiv;
-                    } else {
-                        const runnerDiv = runners[runner.runner_id];
-                        runnerDiv.querySelector('.progress-bar').style.width = `${runner.current_progress}%`;
-                        runnerDiv.querySelector('.progress-bar').textContent = `${runner.current_progress.toFixed(1)}%`;
-                        runnerDiv.querySelector('.time').textContent = runner.time.toFixed(2);
-
-                        if (runner.finished) {
-                            runnerDiv.querySelector('.progress-bar').classList.add('finished');
-                            runnerDiv.querySelector('.status').textContent = 'Finished!';
-                        }
-                    }
-                });
-            });
-
-            // Показываем сообщение о ожидании между гонками
-            setInterval(() => {
-                if (!currentRaceId) {
-                    waitingMessage.style.display = 'block';
-                }
-            }, 5000);
-        </script>
-    </body>
-    </html>
-    """
-    return html_content
 
 
 def start_race():

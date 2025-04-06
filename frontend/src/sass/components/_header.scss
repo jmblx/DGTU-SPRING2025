@@ -1,0 +1,21 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+
+  &__button {
+    display: inline-block;
+    color: #ffffff;
+    padding: 6px 18px;
+    text-transform: uppercase;
+    border-radius: 10px;
+    border: 1px solid #ffffff;
+    background-color: transparent;
+    
+    &:hover {
+      cursor: pointer;
+    }
+  }
+}

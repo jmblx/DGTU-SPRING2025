@@ -5,11 +5,10 @@ import random
 from datetime import UTC, datetime
 from time import perf_counter
 
+from infrastructure.db.models import Race, RaceResult, Runner
 from redis.asyncio import Redis
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-
-from infrastructure.db.models import Runner, Race, RaceResult
 
 DISTANCE = 100
 RANDOMNESS_FACTOR = 0.3
@@ -26,6 +25,12 @@ class RaceManager:
     def __init__(self, session: AsyncSession, redis: Redis):
         self.session = session
         self.redis = redis
+
+    async def _get_current_runners(self) -> list[Runner]:
+        """Получает текущий список участников из БД"""
+        self.session.expire_all()
+        result = await self.session.execute(select(Runner))
+        return result.scalars().all()
 
     def simulate_race(
         self, runners: list[Runner], time_step: float = 0.1
@@ -90,13 +95,16 @@ class RaceManager:
 
     async def create_race(self, runners: list[Runner]) -> Race:
         """Создает новую гонку в БД"""
-        race = Race(
-            start_time=datetime.now(UTC),
-        )
-        self.session.add(race)
-        await self.session.commit()
-        logger.info(f"Created race with ID {race.id}")
-        return race
+        try:
+            race = Race(start_time=datetime.now(UTC))
+            self.session.add(race)
+            await self.session.commit()
+            logger.info(f"Created race with ID {race.id}")
+            return race
+        except Exception as e:
+            logger.error(f"Error creating race: {e}")
+            await self.session.rollback()
+            raise
 
     async def store_race_results(
         self, race_id: int, results: list[tuple[Runner, float, list[float]]]
@@ -149,8 +157,7 @@ class RaceManager:
             try:
                 start_loop_time = perf_counter()
 
-                result = await self.session.execute(select(Runner))
-                runners = result.scalars().all()
+                runners = await self._get_current_runners()
 
                 if not runners:
                     logger.warning("No runners available, waiting...")
@@ -187,3 +194,5 @@ class RaceManager:
 
             except Exception as e:
                 logger.error(f"Error in race loop: {e}")
+                await self.session.rollback()
+                await asyncio.sleep(5)

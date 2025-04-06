@@ -2,18 +2,17 @@ import logging
 from collections.abc import Awaitable, Callable
 from functools import partial
 
+from application.common.errors.base import AppError
+from application.runner.common.errors import (
+    RunnerNotFoundByID,
+    RunnerParameterValidationError,
+)
 from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
+from presentation.web_api.responses import ErrorData, ErrorResponse
 from starlette import status
 from starlette.requests import Request
 from starlette.status import HTTP_500_INTERNAL_SERVER_ERROR
-
-from application.common.errors.base import AppError
-from application.runner.common.errors import (
-    RunnerParameterValidationError,
-    RunnerNotFoundByID,
-)
-from presentation.web_api.responses import ErrorData, ErrorResponse
 
 logger = logging.getLogger(__name__)
 
