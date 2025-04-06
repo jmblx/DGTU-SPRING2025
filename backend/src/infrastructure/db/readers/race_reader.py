@@ -20,19 +20,20 @@ class RaceReader:
         self.session = session
 
     async def read_last_10_races(self) -> dict[int, RacePositions]:
-        """Возвращает данные в формате TypedDict"""
+        """Возвращает данные в формате TypedDict (10 последних гонок, исключая самую последнюю)"""
         result = await self.session.execute(
             select(Race)
             .order_by(desc(Race.start_time))
-            .limit(10)
+            .limit(11)  # Получаем 11 последних
             .options(joinedload(Race.results))
             .execution_options(populate_existing=True)
         )
 
-        # Добавляем .unique() для корректной обработки joinedload
-        last_races = result.unique().scalars().all()
+        races = result.unique().scalars().all()
 
-        races_data: Dict[int, RacePositions] = {}
+        last_races = races[1:]
+
+        races_data: dict[int, RacePositions] = {}
         for race in last_races:
             positions: RacePositions = {
                 result.runner_id: result.position for result in race.results
