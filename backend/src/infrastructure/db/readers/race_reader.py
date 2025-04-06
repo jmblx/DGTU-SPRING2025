@@ -2,6 +2,7 @@ import json
 import logging
 from typing import TypedDict
 
+from application.race_chart_generator import RaceChartGenerator
 from infrastructure.db.models import Race
 from redis.asyncio import Redis
 from sqlalchemy import desc, select
@@ -17,10 +18,11 @@ class RacePositions(TypedDict):
 
 
 class RaceReader:
-    def __init__(self, session: AsyncSession, redis: Redis):
+    def __init__(self, session: AsyncSession, redis: Redis, chart_generator: RaceChartGenerator):
         self.session = session
         self.redis = redis
         self.cache_key = "last_10_races_cache"
+        self.chart_generator = chart_generator
 
     async def read_last_10_races(self) -> dict[int, RacePositions]:
         current_id_raw = await self.redis.get("current_streaming_id")
@@ -110,3 +112,19 @@ class RaceReader:
             logger.info("Race cache invalidated")
         except Exception as e:
             logger.error(f"Error invalidating cache: {e}")
+
+    async def get_race_chart(self, race_id: int) -> str:
+        cache_key = f"race_chart:{race_id}"
+        cached = await self.redis.get(cache_key)
+        if cached:
+            return cached.decode('utf-8')
+
+        img_data = await self.chart_generator.generate_race_chart(race_id)
+        if img_data:
+            await self.redis.set(cache_key, img_data, ex=3600)  # Кэш на 1 час
+
+        return img_data
+
+    async def get_runner_history_chart(self, runner_id: int) -> str:
+
+        return await self.chart_generator.generate_history_chart(runner_id)
