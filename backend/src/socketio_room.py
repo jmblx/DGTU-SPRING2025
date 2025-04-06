@@ -10,7 +10,6 @@ from core.config import config_loader
 from fastapi import FastAPI
 from redis.asyncio import Redis
 from socketio import AsyncServer
-from starlette.responses import HTMLResponse
 
 app = FastAPI(docs_url=None, redoc_url=None, openapi_url=None)
 
