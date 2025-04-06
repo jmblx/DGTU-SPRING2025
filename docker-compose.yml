@@ -63,6 +63,12 @@ services:
     depends_on:
       - db
 
+  frontend:
+    build:
+      context: frontend
+    volumes:
+      - ./build:/app/dist
+
   nginx:
     build:
       context: nginx
@@ -70,6 +76,7 @@ services:
       - "80:80"
       - "443:443"
     volumes:
+      - ./build:/var/www/build
       - ./backend/static:/var/www/static
       - ./nginx/letsencrypt:/etc/letsencrypt
       - ./nginx/webroot:/var/www/certbot
