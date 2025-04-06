@@ -28,6 +28,7 @@ class RaceManager:
 
     async def _get_current_runners(self) -> list[Runner]:
         """Получает текущий список участников из БД"""
+        self.session.expire_all()
         result = await self.session.execute(select(Runner))
         return result.scalars().all()
 
