@@ -5,8 +5,7 @@ from application.runner.common.errors import (
     RunnerNotFoundByID,
     RunnerParameterValidationError,
 )
-from infrastructure.db.models import Runner
-from infrastructure.db.repositories.runner_repo import RunnerRepo, RunnerDTO
+from infrastructure.db.repositories.runner_repo import RunnerDTO, RunnerRepo
 
 
 @dataclass

@@ -1,6 +1,4 @@
-from dataclasses import dataclass
-
-from infrastructure.db.repositories.runner_repo import RunnerRepo, RunnerDTO
+from infrastructure.db.repositories.runner_repo import RunnerDTO, RunnerRepo
 
 
 class GetAllRunnersHandler:
