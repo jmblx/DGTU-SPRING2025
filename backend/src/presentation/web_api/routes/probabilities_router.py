@@ -41,6 +41,7 @@ async def get_probabilities(redis: FromDishka[Redis]):
         top3_probabilities={int(k): v for k, v in top3_probs.items()},
         pair_matrix={
             int(first): RunnerPairProbability(
+                runner_1=pairs.get("1"),
                 runner_2=pairs.get("2"),
                 runner_3=pairs.get("3"),
                 runner_4=pairs.get("4"),

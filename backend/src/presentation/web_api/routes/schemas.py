@@ -36,6 +36,7 @@ class PositionProbability(BaseModel):
     position_6: float
 
 class RunnerPairProbability(BaseModel):
+    runner_1: Optional[float] = None
     runner_2: Optional[float] = None
     runner_3: Optional[float] = None
     runner_4: Optional[float] = None
