@@ -1,4 +1,7 @@
+import logging
 from dataclasses import dataclass
+
+from redis.asyncio import Redis
 
 from application.common.interfaces.uow import Uow
 from application.runner.common.errors import (
@@ -17,10 +20,14 @@ class UpdateRunnerParametersCommand:
     speed_decay: float | None
 
 
+logger = logging.getLogger(__name__)
+
+
 class UpdateRunnerParametersHandler:
-    def __init__(self, runner_repo: RunnerRepo, uow: Uow):
+    def __init__(self, runner_repo: RunnerRepo, uow: Uow, redis: Redis):
         self.runner_repo = runner_repo
         self.uow = uow
+        self.redis = redis
 
     async def handle(self, command: UpdateRunnerParametersCommand) -> RunnerDTO:
         runner = await self.runner_repo.get_runner(command.runner_id)
@@ -65,4 +72,15 @@ class UpdateRunnerParametersHandler:
 
         runner = await self.runner_repo.save(runner)
         await self.uow.commit()
+
+        await self._trigger_probability_recalculation()
+
         return runner
+
+    async def _trigger_probability_recalculation(self):
+        """Устанавливает флаг необходимости пересчета в Redis"""
+        try:
+            await self.redis.set("recalculate_place_probability", "1")
+            logger.info("Triggered probability recalculation flag in Redis")
+        except Exception as e:
+            logger.error(f"Failed to set recalculation flag: {e}")

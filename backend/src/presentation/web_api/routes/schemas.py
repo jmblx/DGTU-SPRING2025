@@ -1,3 +1,5 @@
+from typing import Optional
+
 from pydantic import BaseModel, Field
 
 
@@ -23,3 +25,25 @@ class LastRacesResponse(BaseModel):
         "example": {123: {1: 3, 2: 1}, 124: {5: 1, 2: 2}},
         "description": "Словарь {race_id: {runner_id: position}}",
     }
+
+
+class PositionProbability(BaseModel):
+    position_1: float
+    position_2: float
+    position_3: float
+    position_4: float
+    position_5: float
+    position_6: float
+
+class RunnerPairProbability(BaseModel):
+    runner_2: Optional[float] = None
+    runner_3: Optional[float] = None
+    runner_4: Optional[float] = None
+    runner_5: Optional[float] = None
+    runner_6: Optional[float] = None
+
+class ProbabilityResponse(BaseModel):
+    position_probabilities: dict[int, PositionProbability]
+    top2_probabilities: dict[int, float]
+    top3_probabilities: dict[int, float]
+    pair_matrix: dict[int, RunnerPairProbability]

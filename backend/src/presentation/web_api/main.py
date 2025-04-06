@@ -12,6 +12,7 @@ from fastapi.responses import ORJSONResponse
 from infrastructure.log.main import configure_logging
 from presentation.web_api.exceptions import setup_exception_handlers
 from presentation.web_api.middlwares import setup_middlewares
+from presentation.web_api.routes.probabilities_router import probability_router
 from presentation.web_api.routes.race_router import race_router
 from presentation.web_api.routes.runner_router import runner_router
 
@@ -34,6 +35,7 @@ def create_app() -> FastAPI:
     setup_exception_handlers(app)
     app.include_router(runner_router)
     app.include_router(race_router)
+    app.include_router(probability_router)
     setup_middlewares(app)
     return app
 

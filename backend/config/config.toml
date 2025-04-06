@@ -15,5 +15,5 @@ user = "postgres"
 password = "postgres"
 
 [redis]
-host = "109.120.178.67"
+host = "localhost"
 port = 6379
