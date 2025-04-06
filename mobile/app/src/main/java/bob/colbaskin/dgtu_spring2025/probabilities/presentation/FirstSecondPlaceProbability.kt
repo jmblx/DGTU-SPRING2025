@@ -8,13 +8,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
+import androidx.hilt.navigation.compose.hiltViewModel
 import bob.colbaskin.dgtu_spring2025.probabilities.domain.models.probabilities
+import bob.colbaskin.dgtu_spring2025.races.presentation.RacesViewModel
 import bob.colbaskin.dgtu_spring2025.ui.theme.CustomTheme
 
 import com.breens.beetablescompose.BeeTablesCompose
 
 @Composable
-fun FirstSecondPlaceProbability () {
+fun FirstSecondPlaceProbability (viewModel: RacesViewModel = hiltViewModel()) {
     val titles = listOf("🔴", "🔵", "🟡", "🟢", "🟣", "⚫")
     Box(
         modifier = Modifier

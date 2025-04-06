@@ -1,7 +1,6 @@
 package bob.colbaskin.dgtu_spring2025.races.domain.remote
 
 import bob.colbaskin.dgtu_spring2025.races.domain.models.RunnerParamsDTO
-import kotlinx.coroutines.flow.StateFlow
 
 interface RunnerRepository {
 
@@ -9,5 +8,6 @@ interface RunnerRepository {
 
     suspend fun getRunnersParams(): List<RunnerParamsDTO>
 
-    fun observeParams(): StateFlow<Map<Int, RunnerParamsDTO>>
+    suspend fun getRacesStatsLast(): String
+
 }

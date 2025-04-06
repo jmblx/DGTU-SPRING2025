@@ -11,13 +11,20 @@ import javax.inject.Inject
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import bob.colbaskin.dgtu_spring2025.probabilities.domain.models.Probability
 import bob.colbaskin.dgtu_spring2025.races.domain.models.RunnerParamsDTO
 import bob.colbaskin.dgtu_spring2025.races.domain.remote.RunnerRepository
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 import retrofit2.HttpException
+
+@Serializable
+data class RaceData(val races: Map<String, Map<String, Int>>)
 
 @HiltViewModel
 class RacesViewModel @Inject constructor(
@@ -33,21 +40,37 @@ class RacesViewModel @Inject constructor(
 
     private var cachedParams by mutableStateOf<Map<Int, RunnerParamsDTO>>(emptyMap())
 
+    private val _titles = MutableStateFlow<List<String>>(emptyList())
+    val titles = _titles
+
+    private val _probabilities = MutableStateFlow<List<Probability>>(emptyList())
+    val probabilities =  _probabilities
+
     init {
         observeRaces()
-        observeRunnerParams()
+        getDataForRaceTable()
         viewModelScope.launch {
             Log.d("RacesViewModel", "${runnerRepository.getRunnersParams()}")
+            Log.d("RacesViewModel", "2: ${runnerRepository.getRacesStatsLast()}")
+            runnerRepository.getRacesStatsLast()
+
         }
     }
 
-    private fun observeRunnerParams() {
-        runnerRepository.observeParams()
-            .onEach { params ->
-                cachedParams = params
-                updateCurrentParamsState()
+    fun getDataForRaceTable() {
+        viewModelScope.launch {
+            val jsonString = runnerRepository.getRacesStatsLast()
+            val json = Json { ignoreUnknownKeys = true }
+            val raceData = json.decodeFromString<RaceData>(jsonString.toString())
+
+            val titles = raceData.races.keys.sorted()
+            val probabilities = raceData.races.values.map { race ->
+                val sortedValues = race.entries.sortedBy { it.key.toInt() }.map { it.value }
+                Probability(sortedValues[0], sortedValues[1], sortedValues[2], sortedValues[3], sortedValues[4], sortedValues[5])
             }
-            .launchIn(viewModelScope)
+            _titles.value = titles
+            _probabilities.value = probabilities
+        }
     }
 
     private fun updateCurrentParamsState() {

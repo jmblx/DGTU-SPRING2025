@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -15,6 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import bob.colbaskin.dgtu_spring2025.probabilities.domain.models.convertToProbabilityWithSymbols
 import bob.colbaskin.dgtu_spring2025.probabilities.domain.models.probabilities
 import bob.colbaskin.dgtu_spring2025.ui.theme.CustomTheme
@@ -37,13 +39,15 @@ import com.patrykandpatrick.vico.core.common.shape.CorneredShape
 import kotlinx.coroutines.runBlocking
 
 @Composable
-fun RaceAnalyticsScreen() {
+fun RaceAnalyticsScreen(viewModel: RacesViewModel = viewModel()) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
-        val symbols = listOf("1", "2", "3", "4")
+        val symbols = listOf("1", "2", "3", "4", "5", "6")
+        val titles = viewModel.titles
+        val probabilities = viewModel.probabilities
         item {
             Text(
                 text = "Статистика по забегам",
@@ -51,8 +55,10 @@ fun RaceAnalyticsScreen() {
                 modifier = Modifier.padding(bottom = 2.dp)
             )
             BeeTablesCompose(
-                data = convertToProbabilityWithSymbols(probabilities, symbols),
-                enableTableHeaderTitles = false,
+                data = convertToProbabilityWithSymbols(
+                    probabilities.collectAsState().value, symbols
+                ),
+                enableTableHeaderTitles = true,
                 disableVerticalDividers = true,
                 headerTableTitles = listOf(""),
                 headerTitlesBackGroundColor = Color.DarkGray,

@@ -18,5 +18,5 @@ interface RunnerApiService {
     suspend fun getRunnersParams(): List<RunnerParamsDTO>
 
     @GET("v1/races/last")
-    suspend fun getRacesStatsLast()
+    suspend fun getRacesStatsLast(): String
 }
