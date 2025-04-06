@@ -1,4 +1,4 @@
-package bob.colbaskin.dgtu_spring2025.races.domain
+package bob.colbaskin.dgtu_spring2025.races.domain.remote
 
 import bob.colbaskin.dgtu_spring2025.races.domain.models.Race
 import io.socket.client.Socket

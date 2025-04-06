@@ -1,10 +1,10 @@
-package bob.colbaskin.dgtu_spring2025.races.data
+package bob.colbaskin.dgtu_spring2025.races.data.remote
 
 import android.util.Log
 import bob.colbaskin.dgtu_spring2025.BuildConfig
-import bob.colbaskin.dgtu_spring2025.races.domain.RaceRepository
 import bob.colbaskin.dgtu_spring2025.races.domain.models.Race
 import bob.colbaskin.dgtu_spring2025.races.domain.models.Runner
+import bob.colbaskin.dgtu_spring2025.races.domain.remote.RaceRepository
 import io.socket.client.IO
 import io.socket.client.Socket
 import io.socket.emitter.Emitter
@@ -12,8 +12,9 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import org.json.JSONObject
+import javax.inject.Inject
 
-class RaceRepositoryImpl : RaceRepository {
+class RaceRepositoryImpl @Inject constructor(): RaceRepository {
     override val socket: Socket by lazy {
         IO.socket(BuildConfig.SOCKET_URL).apply {
             connect()

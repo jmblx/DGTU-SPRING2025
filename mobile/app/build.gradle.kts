@@ -86,4 +86,6 @@ dependencies {
         exclude(group = "org.json", module = "json")
     }
     implementation(libs.engine.io.client)
+    implementation(libs.retrofit2.kotlinx.serialization.converter)
+    implementation(libs.logging.interceptor)
 }

@@ -11,15 +11,16 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Button
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -30,6 +31,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -43,54 +45,107 @@ import bob.colbaskin.dgtu_spring2025.utils.Lottie
 @Composable
 fun RaceAnimationScreen(viewModel: RacesViewModel = hiltViewModel()) {
     val uiState by viewModel.uiState
-    val selectedRunner by viewModel.selectedRunner
 
-    Column (
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        when (val state = uiState) {
-            is RaceUiState.Loading -> LoadingView()
-            is RaceUiState.Error -> ErrorView(state.message)
-            is RaceUiState.Success -> RaceContent(state)
-            else -> LoadingView()
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            when (val state = uiState) {
+                is RaceUiState.Loading -> LoadingView()
+                is RaceUiState.Error -> ErrorView(state.message)
+                is RaceUiState.Success -> RaceContent(state)
+            }
         }
-    }
-
-    selectedRunner?.let { runner ->
-        RunnerDetailsDialog(
-            runner = runner,
-            onDismiss = { viewModel.dismissRunnerDialog() }
-        )
+1
+        RunnerParamsDialog(viewModel)
     }
 }
 
 @Composable
-private fun RunnerDetailsDialog(
-    runner: Runner,
-    onDismiss: () -> Unit
-) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = {
-            Text("Участник ${runner.id}", style = MaterialTheme.typography.headlineSmall)
-        },
-        text = {
-            Column {
-                Text("Текущий прогресс: ${"%.1f".format(runner.progress)}%")
-                Spacer(Modifier.height(8.dp))
-                Text("Статус: ${if (runner.finished) "Финишировал" else "В процессе"}")
+private fun RunnerParamsDialog(viewModel: RacesViewModel) {
+    viewModel.selectedRunnerId?.let { runnerId ->
+        AlertDialog(
+            onDismissRequest = { viewModel.hideRunnerParams() },
+            title = { Text("Параметры бегуна #$runnerId") },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    OutlinedTextField(
+                        value = viewModel.reactionTime,
+                        onValueChange = { viewModel.reactionTime = it },
+                        label = { Text("Время реакции (сек)") },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        isError = viewModel.reactionTimeError != null
+                    )
+                    if (viewModel.reactionTimeError != null) {
+                        Text(viewModel.reactionTimeError!!, color = Color.Red)
+                    }
+
+                    OutlinedTextField(
+                        value = viewModel.acceleration,
+                        onValueChange = { viewModel.acceleration = it },
+                        label = { Text("Ускорение (м/с²)") },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        isError = viewModel.accelerationError != null
+                    )
+                    if (viewModel.accelerationError != null) {
+                        Text(viewModel.accelerationError!!, color = Color.Red)
+                    }
+
+                    OutlinedTextField(
+                        value = viewModel.maxSpeed,
+                        onValueChange = { viewModel.maxSpeed = it },
+                        label = { Text("Макс. скорость (м/с)") },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        isError = viewModel.maxSpeedError != null
+                    )
+                    if (viewModel.maxSpeedError != null) {
+                        Text(viewModel.maxSpeedError!!, color = Color.Red)
+                    }
+
+                    OutlinedTextField(
+                        value = viewModel.speedDecay,
+                        onValueChange = { viewModel.speedDecay = it },
+                        label = { Text("Спад скорости (м/с²)") },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        isError = viewModel.speedDecayError != null
+                    )
+                    if (viewModel.speedDecayError != null) {
+                        Text(viewModel.speedDecayError!!, color = Color.Red)
+                    }
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = { viewModel.submitParams() },
+                    enabled = listOf(
+                        viewModel.reactionTime,
+                        viewModel.acceleration,
+                        viewModel.maxSpeed,
+                        viewModel.speedDecay
+                    ).all {
+                        it.isNotBlank() && viewModel.reactionTimeError == null
+                        && viewModel.accelerationError == null
+                        && viewModel.maxSpeedError == null
+                        && viewModel.speedDecayError == null
+                    }
+                ) {
+                    Text("Отправить")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    viewModel.hideRunnerParams()
+                    viewModel.showRunnerParams()
+                }) {
+                    Text("Отмена")
+                }
             }
-        },
-        confirmButton = {
-            TextButton(onClick = onDismiss) {
-                Text("Закрыть")
-            }
-        }
-    )
+        )
+    }
 }
 
 @Composable
@@ -113,7 +168,7 @@ private fun RunnerTrack(runner: Runner, viewModel: RacesViewModel = hiltViewMode
         val textWidth = with(density) { 32.sp.toDp() }
         val maxOffset = maxWidth - textWidth - 24.dp
 
-        val offsetX = animateDpAsState(
+        val offsetX by animateDpAsState(
             targetValue = maxOffset * (runner.progress / 100f),
             animationSpec = tween(durationMillis = 500, easing = LinearEasing)
         )
@@ -129,7 +184,7 @@ private fun RunnerTrack(runner: Runner, viewModel: RacesViewModel = hiltViewMode
         Text(
             text = runner.icon,
             modifier = Modifier
-                .offset(x = offsetX.value)
+                .offset(x = offsetX)
                 .align(Alignment.CenterStart)
                 .zIndex(1f)
                 .padding(start = 6.dp),
